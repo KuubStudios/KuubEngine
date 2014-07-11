@@ -2,14 +2,11 @@
 using System.Diagnostics;
 
 using KuubEngine.Diagnostics;
+using KuubEngine.Utility;
 
 using OpenTK.Graphics.OpenGL4;
 
 namespace KuubEngine.Graphics {
-    public class ShaderCompileException : Exception {
-        public ShaderCompileException(string message) : base(message) {}
-    }
-
     public class Shader : IDisposable {
         private int id;
         public int ID {
@@ -21,10 +18,19 @@ namespace KuubEngine.Graphics {
 
         public ShaderType Type { get; protected set; }
 
+        /// <summary>
+        ///     Creates a new Shader of ShaderType type
+        /// </summary>
+        /// <param name="type"></param>
         public Shader(ShaderType type) {
             Type = type;
         }
 
+        /// <summary>
+        ///     Creates a new Shader of ShaderType type and compiles source
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="source"></param>
         public Shader(ShaderType type, string source) : this(type) {
             Load(source);
         }
@@ -43,9 +49,13 @@ namespace KuubEngine.Graphics {
         }
 
         public override string ToString() {
-            return String.Format("{0} {1}", Type, id);
+            return "{0} {1}".Format(Type, id);
         }
 
+        /// <summary>
+        ///     Load and compile sourcecode
+        /// </summary>
+        /// <param name="source">GLSL sourcecode</param>
         public void Load(string source) {
             GL.ShaderSource(ID, source);
             GL.CompileShader(ID);
@@ -59,6 +69,10 @@ namespace KuubEngine.Graphics {
             if(length > 1) Log.Warn("{0} info log not empty:\n\t{1}", this, GL.GetShaderInfoLog(ID).TrimEnd('\n').Replace("\n", "\n\t"));
         }
 
+        /// <summary>
+        ///     Attaches this Shader to a ShaderProgram
+        /// </summary>
+        /// <param name="program"></param>
         public void Attach(ShaderProgram program) {
             GL.AttachShader(program.ID, ID);
         }

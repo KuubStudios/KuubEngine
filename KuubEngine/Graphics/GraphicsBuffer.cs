@@ -8,8 +8,8 @@ using OpenTK.Graphics.OpenGL4;
 
 namespace KuubEngine.Graphics {
     public class GraphicsBuffer : IDisposable {
-        private uint id;
-        public uint ID {
+        private int id;
+        public int ID {
             get {
                 if(id == 0) GL.GenBuffers(1, out id);
                 return id;

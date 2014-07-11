@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 
+using KuubEngine.Utility;
+
 namespace KuubEngine.Core {
     /// <summary>
     ///     Used to keep track of time
@@ -33,7 +35,7 @@ namespace KuubEngine.Core {
         }
 
         public override string ToString() {
-            return String.Format("{{ Total: {0}, Elapsed: {1} }}", Total, Elapsed);
+            return "{{ Total: {0}, Elapsed: {1} }}".Format(Total, Elapsed);
         }
     }
 }

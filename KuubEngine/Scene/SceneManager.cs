@@ -3,20 +3,20 @@ using System.Collections.Generic;
 
 using KuubEngine.Core;
 
-namespace KuubEngine.State {
-    public class StateManager : IDisposable {
-        public GameState ActiveGameState { get; private set; }
-        public List<GameState> GameStates { get; private set; }
+namespace KuubEngine.Scene {
+    public class SceneManager : IDisposable {
+        public GameScene ActiveGameState { get; private set; }
+        public List<GameScene> GameStates { get; private set; }
 
-        public StateManager() {
-            GameStates = new List<GameState>();
+        public SceneManager() {
+            GameStates = new List<GameScene>();
         }
 
         public void Dispose() {
             while(ActiveGameState != null) Pop();
         }
 
-        public GameState Push(GameState gameState) {
+        public GameScene Push(GameScene gameState) {
             if(gameState == null) throw new ArgumentNullException("gameState");
             if(ActiveGameState != null) ActiveGameState.Pause();
 
@@ -27,8 +27,8 @@ namespace KuubEngine.State {
             return gameState;
         }
 
-        public GameState Pop() {
-            if(ActiveGameState == null) throw new StackOverflowException("There are no GameStates on the stack to pop");
+        public GameScene Pop() {
+            if(ActiveGameState == null) throw new InvalidOperationException("There are no GameStates on the stack to pop");
 
             ActiveGameState.End();
             GameStates.Remove(ActiveGameState);
@@ -41,7 +41,7 @@ namespace KuubEngine.State {
             return ActiveGameState;
         }
 
-        public void Switch(GameState gameState) {
+        public void Switch(GameScene gameState) {
             if(gameState == null) throw new ArgumentNullException("gameState");
 
             if(ActiveGameState != null) ActiveGameState.Pause();

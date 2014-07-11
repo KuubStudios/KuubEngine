@@ -2,6 +2,7 @@
 using System.Diagnostics;
 
 using KuubEngine.Core;
+using KuubEngine.Utility;
 
 namespace KuubEngine.Diagnostics {
     public enum LogLevel {
@@ -23,7 +24,7 @@ namespace KuubEngine.Diagnostics {
         }
 
         public static void Write(LogLevel level, string format, params object[] args) {
-            Write(level, String.Format(format, args));
+            Write(level, format.Format(args));
         }
 
         public static void Debug(object value) {

@@ -1,0 +1,13 @@
+﻿{
+	"name": "basic",
+	"shaders": [
+		{
+			"type": "vertex",
+			"file": "basic.vert"
+		},
+		{
+			"type": "fragment",
+			"file": "basic.frag"
+		}
+	]
+}

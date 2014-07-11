@@ -28,6 +28,10 @@ namespace KuubEngine.Core {
         private readonly GameTime lastGameTime;
 
         private Color4 clearColor;
+
+        /// <summary>
+        ///     Color used to clear at the start of every Draw
+        /// </summary>
         public Color4 ClearColor {
             get { return clearColor; }
             set {
@@ -36,9 +40,20 @@ namespace KuubEngine.Core {
             }
         }
 
+        /// <summary>
+        ///     OpenTK GameWindow
+        /// </summary>
         public GameWindow Window { get; private set; }
+
+        /// <summary>
+        ///     ContentManager to load resources that need special processing
+        /// </summary>
         public ContentManager Content { get; protected set; }
 
+        /// <summary>
+        ///     Create a game with the specified configuration
+        /// </summary>
+        /// <param name="config"></param>
         protected Game(GameConfiguration config) {
             if(config == null) throw new ArgumentNullException("config");
 
@@ -59,6 +74,9 @@ namespace KuubEngine.Core {
             ClearColor = Color4.MidnightBlue;
         }
 
+        /// <summary>
+        ///     Create a new game with the default configuration
+        /// </summary>
         protected Game() : this(GameConfiguration.Default) {}
 
         public void Dispose() {
@@ -73,7 +91,7 @@ namespace KuubEngine.Core {
             Log.Info("Initializing");
             Initialize();
 
-            Content = new ContentManager();
+            Content = new ContentManager("resources/");
 
             Log.Info("Loading content");
             LoadContent(Content);
@@ -83,6 +101,7 @@ namespace KuubEngine.Core {
             Log.Info("Unloading content");
             UnloadContent();
 
+            Content.Unload();
             Texture2D.Blank.Dispose();
         }
 
@@ -147,6 +166,7 @@ namespace KuubEngine.Core {
         /// </summary>
         /// <param name="flip">Flip along Y axis, used for saving as PNG instead of BMP (Very slow!)</param>
         /// <returns>Bitmap of screenshot</returns>
+        /// <exception cref="GraphicsContextMissingException"></exception>
         public Bitmap Screenshot(bool flip = false) {
             if(GraphicsContext.CurrentContext == null) throw new GraphicsContextMissingException();
 

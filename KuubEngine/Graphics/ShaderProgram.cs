@@ -2,15 +2,15 @@
 using System.Diagnostics;
 
 using KuubEngine.Diagnostics;
+using KuubEngine.Utility;
 
 using OpenTK.Graphics.OpenGL4;
 
 namespace KuubEngine.Graphics {
-    public class ShaderLinkException : Exception {
-        public ShaderLinkException(string message) : base(message) {}
-    }
-
     public class ShaderProgram : IDisposable {
+        /// <summary>
+        ///     The ShaderProgram that is currently in use
+        /// </summary>
         public static ShaderProgram Current;
 
         private int id;
@@ -35,25 +35,38 @@ namespace KuubEngine.Graphics {
             }
         }
 
+        /// <summary>
+        ///     Reset the current ShaderProgram being used
+        /// </summary>
         public static void Clear() {
             GL.UseProgram(0);
             Current = null;
         }
 
+        /// <summary>
+        ///     Links the ShaderProgram after attaching all Shaders
+        /// </summary>
         public void Link() {
-            GL.LinkProgram(ID);
-
             int status;
-            GL.GetProgram(ID, GetProgramParameterName.ValidateStatus, out status);
+
+            GL.LinkProgram(ID);
+            GL.GetProgram(ID, GetProgramParameterName.LinkStatus, out status);
             if(status != 1) throw new ShaderLinkException(GL.GetProgramInfoLog(ID));
 
+#if DEBUG
             GL.ValidateProgram(ID);
+            GL.GetProgram(ID, GetProgramParameterName.ValidateStatus, out status);
+            if(status != 1) throw new ShaderValidateException(GL.GetProgramInfoLog(ID));
+#endif
 
             int length;
             GL.GetProgram(ID, GetProgramParameterName.InfoLogLength, out length);
             if(length > 1) Log.Warn("ShaderProgram {0} info log not empty:\n\t{1}", ID, GL.GetProgramInfoLog(ID));
         }
 
+        /// <summary>
+        ///     Start using this ShaderProgram for drawing
+        /// </summary>
         public void Use() {
             if(Current == this) return;
 

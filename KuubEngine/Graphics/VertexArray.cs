@@ -5,8 +5,8 @@ using OpenTK.Graphics.OpenGL4;
 
 namespace KuubEngine.Graphics {
     public class VertexArray : IDisposable {
-        private uint id;
-        public uint ID {
+        private int id;
+        public int ID {
             get {
                 if(id == 0) GL.GenVertexArrays(1, out id);
                 return id;

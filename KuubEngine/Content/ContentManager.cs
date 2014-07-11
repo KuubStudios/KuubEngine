@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace KuubEngine.Content {
-    public class ContentLoadException : Exception {
-        public ContentLoadException(string message) : base(message) {}
-    }
+using KuubEngine.Utility;
 
+namespace KuubEngine.Content {
     public class ContentManager {
-        private readonly Dictionary<string, IAsset> loadedAssets = new Dictionary<string, IAsset>();
+        private readonly Dictionary<string, Asset> loadedAssets = new Dictionary<string, Asset>();
 
         public string BasePath { get; set; }
 
@@ -15,17 +13,20 @@ namespace KuubEngine.Content {
             BasePath = basepath;
         }
 
-        public T Load<T>(string path, bool async = true) where T : IAsset {
+        public T Load<T>(string path, bool async = true) where T : Asset {
             path = BasePath + path;
 
-            IAsset existing;
+            Asset existing;
             if(loadedAssets.TryGetValue(path, out existing)) {
                 if(existing is T) return (T)existing;
                 throw new ContentLoadException(path + " is already loaded as a different type in this ContentManager!");
             }
 
-            T asset = (T)Activator.CreateInstance(typeof(T), path);
-            asset.Load();
+            T asset = (T)Activator.CreateInstance(typeof(T));
+            asset.Load(path);
+
+            loadedAssets[path] = asset;
+
             return asset;
         }
 

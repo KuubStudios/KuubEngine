@@ -7,8 +7,8 @@ namespace KuubEngine.Graphics {
     public abstract class Texture : IDisposable {
         public static Texture Current { get; private set; }
 
-        private uint id;
-        public uint ID {
+        private int id;
+        public int ID {
             get {
                 if(id == 0) GL.GenTextures(1, out id);
                 return id;

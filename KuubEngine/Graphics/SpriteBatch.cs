@@ -32,7 +32,7 @@ namespace KuubEngine.Graphics {
         private static readonly ShaderProgram ShaderProgram;
         private static int ShaderReferences;
 
-        private readonly GraphicsBuffer vertexBuffer, colorBuffer, texBuffer;
+        private readonly GraphicsBuffer vertexBuffer, colorBuffer;//, texBuffer;
         private readonly VertexArray vertexArray;
         private readonly Vector3[] vertices = new Vector3[MaxSprites * 6];
         private readonly Color4[] colors = new Color4[MaxSprites * 6];
@@ -53,7 +53,7 @@ namespace KuubEngine.Graphics {
                 out vec4 frag_color;
 
                 void main () {
-                    gl_Position = vec4(vertex_pos, 1);
+                    gl_Position = vec4(vertex_pos, 1.0);
                     frag_color = vertex_color;
                 }
             ");
@@ -86,19 +86,19 @@ namespace KuubEngine.Graphics {
             vertexBuffer.SetData(vertices);
             colorBuffer = new GraphicsBuffer(BufferTarget.ArrayBuffer);
             colorBuffer.SetData(colors);
-            texBuffer = new GraphicsBuffer(BufferTarget.ArrayBuffer);
-            texBuffer.SetData(texCoords);
+            //texBuffer = new GraphicsBuffer(BufferTarget.ArrayBuffer);
+            //texBuffer.SetData(texCoords);
 
             vertexArray = new VertexArray();
             vertexArray.BindBuffer(vertexBuffer, 0);
             vertexArray.BindBuffer(colorBuffer, 1);
-            vertexArray.BindBuffer(texBuffer, 2);
+            //vertexArray.BindBuffer(texBuffer, 2);
         }
 
         public void Dispose() {
             vertexBuffer.Dispose();
             colorBuffer.Dispose();
-            texBuffer.Dispose();
+            //texBuffer.Dispose();
             vertexArray.Dispose();
 
             ShaderReferences--;
@@ -115,7 +115,7 @@ namespace KuubEngine.Graphics {
 
             vertexBuffer.SetData(vertices);
             colorBuffer.SetData(colors);
-            texBuffer.SetData(texCoords);
+            //texBuffer.SetData(texCoords);
 
             ShaderProgram.Use();
             vertexArray.Bind();

@@ -1,4 +1,10 @@
-﻿using OpenTK;
+﻿using System.IO;
+
+using KuubEngine.Diagnostics;
+
+using Newtonsoft.Json;
+
+using OpenTK;
 using OpenTK.Graphics;
 
 namespace KuubEngine.Core {
@@ -21,6 +27,7 @@ namespace KuubEngine.Core {
         /// <summary>
         ///     GraphicsMode passed to the GameWindow constructor
         /// </summary>
+        [JsonIgnore]
         public GraphicsMode GraphicsMode { get; set; }
 
         /// <summary>
@@ -31,6 +38,7 @@ namespace KuubEngine.Core {
         /// <summary>
         ///     DisplayDevice passed to the GameWindow constructor
         /// </summary>
+        [JsonIgnore]
         public DisplayDevice DisplayDevice { get; set; }
 
         /// <summary>
@@ -46,27 +54,30 @@ namespace KuubEngine.Core {
         /// <summary>
         ///     GraphicsContextFlags passed to the GameWindow constructor
         /// </summary>
+        [JsonIgnore]
         public GraphicsContextFlags GraphicsContextFlags { get; set; }
 
         /// <summary>
         ///     GameWindow caption, visible in windowed mode and taskbar
         /// </summary>
+        [JsonIgnore]
         public string Caption { get; set; }
 
         /// <summary>
         ///     Internal game name which is passed to CrashReporter
         /// </summary>
+        [JsonIgnore]
         public string Name { get; set; }
 
         static GameConfiguration() {
-            Default = new GameConfiguration("KuubGame");
+            Default = new GameConfiguration();
         }
 
-        public GameConfiguration(int width, int height, string name) {
+        public GameConfiguration(int width, int height, string name, bool fullscreen = false) {
             Width = width;
             Height = height;
             GraphicsMode = GraphicsMode.Default;
-            GameWindowFlags = GameWindowFlags.FixedWindow;
+            GameWindowFlags = fullscreen ? GameWindowFlags.Fullscreen : GameWindowFlags.FixedWindow;
             DisplayDevice = DisplayDevice.Default;
             GraphicsContextFlags = GraphicsContextFlags.ForwardCompatible;
             Major = 1;
@@ -76,5 +87,31 @@ namespace KuubEngine.Core {
         }
 
         public GameConfiguration(string name) : this(800, 600, name) {}
+
+        public GameConfiguration() : this("KuubGame") {}
+
+        public GameConfiguration LoadFile(string file) {
+            if (!File.Exists(file)) {
+                Log.Warn("Settings file {0} doesn't exist, creating default one", file);
+                Default.SaveFile(file);
+                return Default;
+            }
+
+            GameConfiguration config = JsonConvert.DeserializeObject<GameConfiguration>(File.ReadAllText(file));
+            return config;
+        }
+
+        public void SaveFile(string file) { // TODO: handle file saving exceptions
+            using(FileStream fs = File.Open(file, FileMode.Create)) {
+                using(StreamWriter sw = new StreamWriter(fs)) {
+                    using(JsonWriter jw = new JsonTextWriter(sw)) {
+                        jw.Formatting = Formatting.Indented;
+
+                        JsonSerializer serializer = new JsonSerializer();
+                        serializer.Serialize(jw, this);
+                    }
+                }
+            }
+        }
     }
 }
