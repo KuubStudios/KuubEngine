@@ -1,6 +1,7 @@
 ﻿using System;
 
 using KuubEngine.Diagnostics;
+using KuubEngine.Utility;
 
 using OpenTK.Graphics.OpenGL4;
 
@@ -21,14 +22,17 @@ namespace KuubEngine.Graphics {
             Log.Info("Vendor: {0}", vendor);
             Log.Info("Renderer: {0}", GL.GetString(StringName.Renderer));
 
-            string version = GL.GetString(StringName.Version);
             try {
-                GLVersion = new Version(version);
-            } catch(Exception) {
+                string version = GL.GetString(StringName.Version);
+                GLVersion = new Version(version.Split(' ')[0]);
+                Util.CheckGLError();
+                Log.Info("GL Version: {0} ({1})", GLVersion, version);
+            } catch(Exception e) {
+                Log.Warn("Failed to parse GL Version");
                 GLVersion = new Version(GL.GetInteger(GetPName.MajorVersion), GL.GetInteger(GetPName.MinorVersion));
+                Log.Info("GL Version: {0} ({1})", GLVersion, e.Message);
             }
 
-            Log.Info("GL Version: {0} ({1})", GLVersion, GL.GetString(StringName.Version));
             Log.Info("GLSL: {0}", GL.GetString(StringName.ShadingLanguageVersion));
         }
 

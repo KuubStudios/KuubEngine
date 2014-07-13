@@ -28,7 +28,6 @@ namespace KuubEngine.Core {
         private readonly GameTime lastGameTime;
 
         private Color4 clearColor;
-
         /// <summary>
         ///     Color used to clear at the start of every Draw
         /// </summary>
