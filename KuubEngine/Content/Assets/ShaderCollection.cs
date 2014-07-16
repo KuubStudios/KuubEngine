@@ -64,6 +64,9 @@ namespace KuubEngine.Content.Assets {
 
             [JsonProperty("file", Required = Required.Always)]
             public string File { get; set; }
+
+            [JsonProperty("fragdata", Required = Required.Default)]
+            public Dictionary<string, int> FragData { get; set; }
         }
 
         [UsedImplicitly]
@@ -75,7 +78,7 @@ namespace KuubEngine.Content.Assets {
             public SerializedShader[] Shaders { get; set; }
 
             [JsonProperty("attributes", Required = Required.Default)]
-            public Dictionary<string, int> Attributes { get; set; } 
+            public Dictionary<string, int> Attributes { get; set; }
         }
 
         public ShaderProgram Program { get; protected set; }
@@ -96,14 +99,12 @@ namespace KuubEngine.Content.Assets {
                 shader.Attach(Program);
                 shaders.Add(shader);
 
+                if(json.Shaders[i].Type == ShaderType.FragmentShader && json.Shaders[i].FragData != null) foreach(var fragdata in json.Shaders[i].FragData) GL.BindFragDataLocation(Program.ID, fragdata.Value, fragdata.Key);
+
                 Log.Debug("\tFound {0} {1}", json.Shaders[i].Type, json.Shaders[i].File);
             }
 
-            if(json.Attributes != null && json.Attributes.Count > 0) {
-                foreach(var attrib in json.Attributes) {
-                    GL.BindAttribLocation(Program.ID, attrib.Value, attrib.Key);
-                }
-            }
+            if(json.Attributes != null && json.Attributes.Count > 0) foreach(var attrib in json.Attributes) GL.BindAttribLocation(Program.ID, attrib.Value, attrib.Key);
 
             Program.Link();
 
