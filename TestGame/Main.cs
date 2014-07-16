@@ -27,8 +27,6 @@ namespace TestGame {
                 new Vector3(-0.5f, 0.5f, 0.0f),
                 new Vector3(0.5f, 0.5f, 0.0f),
                 new Vector3(0.5f, -0.5f, 0.0f),
-                //new Vector3(-0.5f, 0.5f, 0.0f),
-                //new Vector3(0.5f, -0.5f, 0.0f),
                 new Vector3(-0.5f, -0.5f, 0.0f)
             });
 

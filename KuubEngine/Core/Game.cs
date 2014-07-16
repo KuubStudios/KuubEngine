@@ -91,9 +91,9 @@ namespace KuubEngine.Core {
 
             GraphicsDevice.Initialize();
 
-            //GL.FrontFace(FrontFaceDirection.Cw);
-            //GL.PolygonMode(MaterialFace.Back, PolygonMode.Line);
-            //GL.PolygonMode(MaterialFace.Front, PolygonMode.Fill);
+            GL.Enable(EnableCap.CullFace);
+            GL.FrontFace(FrontFaceDirection.Cw);
+            GL.CullFace(CullFaceMode.Back);
 
             Log.Info("Initializing");
             Initialize();
