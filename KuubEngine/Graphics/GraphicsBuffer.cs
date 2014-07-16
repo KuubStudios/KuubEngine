@@ -23,6 +23,7 @@ namespace KuubEngine.Graphics {
         public BufferTarget Target { get; protected set; }
         public BufferUsageHint Usage { get; protected set; }
 
+
         public GraphicsBuffer(BufferTarget target, BufferUsageHint usage = BufferUsageHint.StaticDraw) {
             Target = target;
             Usage = usage;
@@ -48,8 +49,13 @@ namespace KuubEngine.Graphics {
             Stride = stride;
             Type = type;
 
-            GL.BindBuffer(Target, ID);
+            Bind();
             GL.BufferData(Target, new IntPtr(Length * Marshal.SizeOf(typeof(T))), data, Usage);
+            Unbind();
+        }
+
+        public void SetData(int[] data) {
+            SetData(data, 1, VertexAttribPointerType.Int);
         }
 
         public void SetData(Vector3[] data) {
@@ -65,9 +71,11 @@ namespace KuubEngine.Graphics {
         }
 
         public void Bind() {
-            if(Length == 0) return;
-
             GL.BindBuffer(Target, ID);
+        }
+
+        public void Unbind() {
+            GL.BindBuffer(Target, 0);
         }
     }
 }

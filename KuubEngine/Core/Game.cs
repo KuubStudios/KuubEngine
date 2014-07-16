@@ -58,6 +58,10 @@ namespace KuubEngine.Core {
 
             lastGameTime = new GameTime();
 
+#if DEBUG
+            config.GraphicsContextFlags = config.GraphicsContextFlags | GraphicsContextFlags.Debug;
+#endif
+
             Window = new GameWindow(config.Width, config.Height, config.GraphicsMode, config.Caption, config.GameWindowFlags, config.DisplayDevice, config.Major, config.Minor, config.GraphicsContextFlags);
 
             Window.Load += Load;
@@ -87,6 +91,10 @@ namespace KuubEngine.Core {
 
             GraphicsDevice.Initialize();
 
+            //GL.FrontFace(FrontFaceDirection.Cw);
+            //GL.PolygonMode(MaterialFace.Back, PolygonMode.Line);
+            //GL.PolygonMode(MaterialFace.Front, PolygonMode.Fill);
+
             Log.Info("Initializing");
             Initialize();
 
@@ -104,8 +112,9 @@ namespace KuubEngine.Core {
             Texture2D.Blank.Dispose();
         }
 
-        private void Resize(object sender, EventArgs eventArgs) {
+        private void Resize(object sender, EventArgs e) {
             GL.Viewport(0, 0, Window.Width, Window.Height);
+            Resized();
         }
 
         private void UpdateFrame(object sender, FrameEventArgs e) {
@@ -140,6 +149,11 @@ namespace KuubEngine.Core {
         protected virtual void UnloadContent() {}
 
         /// <summary>
+        ///     Called when the game is resized, GL.Viewport is set automatically
+        /// </summary>
+        protected virtual void Resized() {}
+
+        /// <summary>
         ///     Called at a constant rate of 60 times per second
         /// </summary>
         /// <param name="gameTime">GameTime</param>
@@ -158,6 +172,13 @@ namespace KuubEngine.Core {
         /// <param name="args">Command line arguments</param>
         public void Run(string[] args) {
             Window.Run(60);
+        }
+
+        /// <summary>
+        ///     Exit the game
+        /// </summary>
+        public void Exit() {
+            Window.Exit();
         }
 
         /// <summary>

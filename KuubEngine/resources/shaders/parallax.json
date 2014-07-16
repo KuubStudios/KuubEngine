@@ -1,0 +1,16 @@
+﻿{
+	"name": "parallax",
+	"shaders": [
+		{
+			"type": "vertex",
+			"file": "parallax.vert"
+		},
+		{
+			"type": "fragment",
+			"file": "parallax.frag"
+		}
+	],
+	"attributes": {
+		"AttributeTangent": 5
+	}
+}

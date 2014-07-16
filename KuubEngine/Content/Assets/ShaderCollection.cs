@@ -73,6 +73,9 @@ namespace KuubEngine.Content.Assets {
 
             [JsonProperty("shaders", Required = Required.Always)]
             public SerializedShader[] Shaders { get; set; }
+
+            [JsonProperty("attributes", Required = Required.Default)]
+            public Dictionary<string, int> Attributes { get; set; } 
         }
 
         public ShaderProgram Program { get; protected set; }
@@ -96,6 +99,12 @@ namespace KuubEngine.Content.Assets {
                 Log.Debug("\tFound {0} {1}", json.Shaders[i].Type, json.Shaders[i].File);
             }
 
+            if(json.Attributes != null && json.Attributes.Count > 0) {
+                foreach(var attrib in json.Attributes) {
+                    GL.BindAttribLocation(Program.ID, attrib.Value, attrib.Key);
+                }
+            }
+
             Program.Link();
 
             base.Load(path);
@@ -106,6 +115,10 @@ namespace KuubEngine.Content.Assets {
             Program.Dispose();
 
             base.Unload();
+        }
+
+        public void Use() {
+            Program.Use();
         }
     }
 }

@@ -62,6 +62,10 @@ namespace KuubEngine.Graphics {
             int length;
             GL.GetProgram(ID, GetProgramParameterName.InfoLogLength, out length);
             if(length > 1) Log.Warn("ShaderProgram {0} info log not empty:\n\t{1}", ID, GL.GetProgramInfoLog(ID));
+
+            int attributes;
+            GL.GetProgram(ID, GetProgramParameterName.ActiveAttributes, out attributes);
+            Log.Debug("Program {0} linked with {1} attributes", ID, attributes);
         }
 
         /// <summary>

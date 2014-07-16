@@ -8,8 +8,10 @@
 
 # Build results
 [Dd]ebug/
+!Libraries/Debug
 [Dd]ebugPublic/
 [Rr]elease/
+!Libraries/Release
 x64/
 build/
 bld/

@@ -33,8 +33,17 @@ namespace KuubEngine.Graphics {
             GL.VertexAttribPointer(index, buffer.Stride, buffer.Type, false, 0, 0);
         }
 
+        public void BindBuffer(GraphicsBuffer buffer) {
+            Bind();
+            buffer.Bind();
+        }
+
         public void Bind() {
             GL.BindVertexArray(ID);
+        }
+
+        public static void Unbind() {
+            GL.BindVertexArray(0);
         }
     }
 }
