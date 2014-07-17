@@ -84,31 +84,33 @@ namespace KuubEngine.Content.Assets {
         public ShaderProgram Program { get; protected set; }
         private readonly List<Shader> shaders = new List<Shader>();
 
-        // TODO: do some fool proof path handling because this is retarded
         public override void Load(string path) {
-            Log.Debug("Attempting to load ShaderCollection {0}.json", path);
+            base.Load(path + ".json");
+        }
 
-            var json = JsonConvert.DeserializeObject<SerializedShaderCollection>(File.ReadAllText(path + ".json"));
+        public override void Load(Stream file, string root) {
+            StreamReader reader = new StreamReader(file);
+            var json = JsonConvert.DeserializeObject<SerializedShaderCollection>(reader.ReadToEnd());
 
             Log.Debug("Loading shader {0}", json.Name);
 
             Program = new ShaderProgram();
 
-            for(int i = 0; i < json.Shaders.Length; i++) {
-                Shader shader = new Shader(json.Shaders[i].Type, File.ReadAllText(Path.GetDirectoryName(path + ".json") + "/" + json.Shaders[i].File));
+            for (int i = 0; i < json.Shaders.Length; i++) {
+                Log.Debug("\tFound {0} {1}", json.Shaders[i].Type, json.Shaders[i].File);
+
+                Shader shader = new Shader(json.Shaders[i].Type, File.ReadAllText(Path.Combine(root, json.Shaders[i].File)));
                 shader.Attach(Program);
                 shaders.Add(shader);
 
-                if(json.Shaders[i].Type == ShaderType.FragmentShader && json.Shaders[i].FragData != null) foreach(var fragdata in json.Shaders[i].FragData) GL.BindFragDataLocation(Program.ID, fragdata.Value, fragdata.Key);
-
-                Log.Debug("\tFound {0} {1}", json.Shaders[i].Type, json.Shaders[i].File);
+                if (json.Shaders[i].Type == ShaderType.FragmentShader && json.Shaders[i].FragData != null) foreach (var fragdata in json.Shaders[i].FragData) GL.BindFragDataLocation(Program.ID, fragdata.Value, fragdata.Key);
             }
 
-            if(json.Attributes != null && json.Attributes.Count > 0) foreach(var attrib in json.Attributes) GL.BindAttribLocation(Program.ID, attrib.Value, attrib.Key);
+            if (json.Attributes != null && json.Attributes.Count > 0) foreach (var attrib in json.Attributes) GL.BindAttribLocation(Program.ID, attrib.Value, attrib.Key);
 
             Program.Link();
 
-            base.Load(path);
+            base.Load(file, root);
         }
 
         public override void Unload() {

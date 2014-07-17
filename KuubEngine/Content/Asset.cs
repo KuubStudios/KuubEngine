@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
+
+using Microsoft.SqlServer.Server;
 
 namespace KuubEngine.Content {
     public abstract class Asset : IDisposable {
@@ -12,6 +15,10 @@ namespace KuubEngine.Content {
 #endif
 
         public virtual void Load(string path) {
+            Load(File.Open(path, FileMode.Open), Path.GetDirectoryName(path));
+        }
+
+        public virtual void Load(Stream file, string root) {
             Loaded = true;
         }
 
