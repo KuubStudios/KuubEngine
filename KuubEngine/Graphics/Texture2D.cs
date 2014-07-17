@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Drawing;
 
-using KuubEngine.Content;
-
 using OpenTK;
 using OpenTK.Graphics.OpenGL4;
 

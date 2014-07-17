@@ -1,11 +1,10 @@
-﻿using System;
-
-using KuubEngine.Content;
+﻿using KuubEngine.Content;
 using KuubEngine.Content.Assets;
 using KuubEngine.Core;
 using KuubEngine.Graphics;
 
 using OpenTK;
+using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Input;
 
@@ -72,12 +71,12 @@ namespace TestGame {
         }
 
         protected override void Draw(GameTime gameTime, float interpolation) {
-            basicShader.Use();
-            vertexArray.Bind();
+            //basicShader.Use();
+            //vertexArray.Bind();
             //GL.DrawArrays(PrimitiveType.Triangles, 0, buffer.Length);
-            GL.DrawElements(PrimitiveType.Triangles, indexBuffer.Length, DrawElementsType.UnsignedInt, IntPtr.Zero);
+            //GL.DrawElements(PrimitiveType.Triangles, indexBuffer.Length, DrawElementsType.UnsignedInt, IntPtr.Zero);
 
-            //using(spriteBatch.Use) spriteBatch.Draw(texture, -0.5f, -0.5f, 1, 1, Color4.Black);
+            using(spriteBatch.Use) spriteBatch.Draw(texture, -0.5f, -0.5f, 1, 1, Color4.Black);
         }
     }
 }

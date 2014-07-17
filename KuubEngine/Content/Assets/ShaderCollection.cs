@@ -57,7 +57,7 @@ namespace KuubEngine.Content.Assets {
             }
         }
 
-        [UsedImplicitly]
+        [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
         private class SerializedShader {
             [JsonProperty("type", Required = Required.Always), JsonConverter(typeof(ShaderTypeEnumConverter))]
             public ShaderType Type { get; set; }
@@ -69,7 +69,7 @@ namespace KuubEngine.Content.Assets {
             public Dictionary<string, int> FragData { get; set; }
         }
 
-        [UsedImplicitly]
+        [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
         private class SerializedShaderCollection {
             [JsonProperty("name", Required = Required.Always)]
             public string Name { get; set; }
