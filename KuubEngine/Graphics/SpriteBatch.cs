@@ -47,9 +47,6 @@ namespace KuubEngine.Graphics {
 
         public IDisposable Use { get; private set; }
 
-        private Bitmap bitmap = new Bitmap("wut.png");
-        private int texture;
-
         static SpriteBatch() {
             shaderCollection = new ShaderCollection();
             shaderCollection.Load("resources/shaders/sprite");
@@ -74,17 +71,7 @@ namespace KuubEngine.Graphics {
             vertexArray.BindBuffer(vertexBuffer, shaderCollection.Program, "in_pos");
             vertexArray.BindBuffer(indexBuffer);
             vertexArray.BindBuffer(colorBuffer, shaderCollection.Program, "in_color");
-            vertexArray.BindBuffer(texBuffer, shaderCollection.Program, "in_texcoord");
-
-            
-            GL.GenTextures(1, out texture);
-            GL.BindTexture(TextureTarget.Texture2D, texture);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-            BitmapData data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, data.Width, data.Height, 0, OpenTK.Graphics.OpenGL4.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
-            bitmap.UnlockBits(data);
-            
+            vertexArray.BindBuffer(texBuffer, shaderCollection.Program, "in_texcoord");          
         }
 
         public void Dispose() {
@@ -98,8 +85,6 @@ namespace KuubEngine.Graphics {
             if(shaderReferences < 1) { // this is broken if you dispose all spritebatches and then make a new one
                 shaderCollection.Dispose();
             }
-
-            GL.DeleteTextures(1, ref texture);
         }
 
         public void Flush() {
@@ -114,16 +99,14 @@ namespace KuubEngine.Graphics {
 
             shaderCollection.Use();
 
-            //GL.BindTexture(TextureTarget.Texture2D, texture);
-
             /*
             if(Texture.Current != null) {
                 GL.ActiveTexture(TextureUnit.Texture0);
                 shaderCollection.Program.SetUniform1("tex", Texture.Current.ID);
             }
             */
+
             vertexArray.Bind();
-            //GL.DrawArrays(PrimitiveType.Triangles, 0, cacheSize * 6);
             GL.DrawElements(PrimitiveType.Triangles, cacheSize * 6, DrawElementsType.UnsignedInt, IntPtr.Zero);
 
             Array.Clear(vertices, 0, vertices.Length);
