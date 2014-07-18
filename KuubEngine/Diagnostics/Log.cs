@@ -24,7 +24,7 @@ namespace KuubEngine.Diagnostics {
         }
 
         public static void Write(LogLevel level, string format, params object[] args) {
-            Write(level, format.Format(args));
+            Write(level, args == null || args.Length == 0 ? format : format.Format(args));
         }
 
         public static void Debug(object value) {
