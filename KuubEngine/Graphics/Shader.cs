@@ -7,6 +7,14 @@ using KuubEngine.Utility;
 using OpenTK.Graphics.OpenGL4;
 
 namespace KuubEngine.Graphics {
+    public class ShaderCompileException : Exception {
+        public string SourceCode { get; set; }
+
+        public ShaderCompileException(string message, string sourcecode) : base(message) {
+            SourceCode = sourcecode;
+        }
+    }
+
     public class Shader : IDisposable {
         private int id;
         public int ID {
@@ -62,7 +70,7 @@ namespace KuubEngine.Graphics {
 
             int status;
             GL.GetShader(ID, ShaderParameter.CompileStatus, out status);
-            if(status != 1) throw new ShaderCompileException(GL.GetShaderInfoLog(ID));
+            if(status != 1) throw new ShaderCompileException(GL.GetShaderInfoLog(ID), source);
 
             int length;
             GL.GetShader(ID, ShaderParameter.InfoLogLength, out length);

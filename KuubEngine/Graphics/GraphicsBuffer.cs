@@ -58,6 +58,10 @@ namespace KuubEngine.Graphics {
             SetData(data, 1, VertexAttribPointerType.Int);
         }
 
+        public void SetData(uint[] data) {
+            SetData(data, 1, VertexAttribPointerType.UnsignedInt);
+        }
+
         public void SetData(Vector3[] data) {
             SetData(data, 3, VertexAttribPointerType.Float);
         }

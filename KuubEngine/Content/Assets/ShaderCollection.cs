@@ -98,8 +98,10 @@ namespace KuubEngine.Content.Assets {
 
             for (int i = 0; i < json.Shaders.Length; i++) {
                 Log.Debug("\tFound {0} {1}", json.Shaders[i].Type, json.Shaders[i].File);
+                
 
                 Shader shader = new Shader(json.Shaders[i].Type, File.ReadAllText(Path.Combine(root, json.Shaders[i].File)));
+
                 shader.Attach(Program);
                 shaders.Add(shader);
 

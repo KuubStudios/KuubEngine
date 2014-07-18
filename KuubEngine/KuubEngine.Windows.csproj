@@ -117,6 +117,15 @@
     <None Include="resources\shaders\parallax.vert">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="resources\shaders\sprite.frag">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="resources\shaders\sprite.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="resources\shaders\sprite.vert">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Utility\Exceptions.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Exceptions.cs</LastGenOutput>

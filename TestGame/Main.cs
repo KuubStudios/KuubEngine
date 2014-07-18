@@ -1,4 +1,6 @@
-﻿using KuubEngine.Content;
+﻿using System;
+
+using KuubEngine.Content;
 using KuubEngine.Content.Assets;
 using KuubEngine.Core;
 using KuubEngine.Graphics;
@@ -10,9 +12,11 @@ using OpenTK.Input;
 
 namespace TestGame {
     public class Main : Game {
+        /*
         private GraphicsBuffer buffer, indexBuffer, normalBuffer;
         private VertexArray vertexArray;
         private ShaderCollection basicShader;
+        */
         private SpriteBatch spriteBatch;
         private Texture2D texture;
 
@@ -20,7 +24,7 @@ namespace TestGame {
 
         protected override void LoadContent(ContentManager content) {
             spriteBatch = new SpriteBatch();
-
+            /*
             buffer = new GraphicsBuffer(BufferTarget.ArrayBuffer);
             buffer.SetData(new Vector3[] {
                 new Vector3(-0.5f, 0.5f, 0.0f),
@@ -49,18 +53,21 @@ namespace TestGame {
             vertexArray.BindBuffer(indexBuffer);
             VertexArray.Unbind();
 
-            texture = new Texture2D("wut.png");
-
             basicShader = Content.Load<ShaderCollection>("shaders/basic");
+            */
+
+            texture = new Texture2D("wut.png");
         }
 
         protected override void UnloadContent() {
             spriteBatch.Dispose();
 
+            /*
             buffer.Dispose();
             indexBuffer.Dispose();
             normalBuffer.Dispose();
             vertexArray.Dispose();
+            */
 
             texture.Dispose();
 
@@ -76,7 +83,10 @@ namespace TestGame {
             //GL.DrawArrays(PrimitiveType.Triangles, 0, buffer.Length);
             //GL.DrawElements(PrimitiveType.Triangles, indexBuffer.Length, DrawElementsType.UnsignedInt, IntPtr.Zero);
 
-            using(spriteBatch.Use) spriteBatch.Draw(texture, -0.5f, -0.5f, 1, 1, Color4.Black);
+            using(spriteBatch.Use) {
+                spriteBatch.Draw(texture, -0.5f, -0.5f, 1f, 1f, Color4.White);
+                //spriteBatch.Draw(texture, 0, 0, 1, 1, Color4.Green);
+            }
         }
     }
 }

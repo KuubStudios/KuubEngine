@@ -33,6 +33,10 @@ namespace KuubEngine.Graphics {
             GL.VertexAttribPointer(index, buffer.Stride, buffer.Type, false, 0, 0);
         }
 
+        public void BindBuffer(GraphicsBuffer buffer, ShaderProgram program, string name) {
+            BindBuffer(buffer, program.GetAttribLocation(name));
+        }
+
         public void BindBuffer(GraphicsBuffer buffer) {
             Bind();
             buffer.Bind();

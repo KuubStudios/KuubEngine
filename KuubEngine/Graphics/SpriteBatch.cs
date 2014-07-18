@@ -1,4 +1,9 @@
 ﻿using System;
+using System.Drawing;
+using System.Drawing.Imaging;
+
+using KuubEngine.Content.Assets;
+using KuubEngine.Diagnostics;
 
 using OpenTK;
 using OpenTK.Graphics;
@@ -28,110 +33,113 @@ namespace KuubEngine.Graphics {
             }
         }
 
-        private static readonly Shader VertexShader, FragShader;
-        private static readonly ShaderProgram ShaderProgram;
-        private static int ShaderReferences;
+        private static readonly ShaderCollection shaderCollection;
+        private static int shaderReferences;
 
-        private readonly GraphicsBuffer vertexBuffer, colorBuffer;//, texBuffer;
+        private readonly GraphicsBuffer vertexBuffer, indexBuffer, colorBuffer, texBuffer;
         private readonly VertexArray vertexArray;
-        private readonly Vector3[] vertices = new Vector3[MaxSprites * 6];
-        private readonly Color4[] colors = new Color4[MaxSprites * 6];
+        private readonly Vector2[] vertices = new Vector2[MaxSprites * 4];
+        private readonly uint[] indices = new uint[MaxSprites * 6];
+        private readonly Color4[] colors = new Color4[MaxSprites * 4];
         private readonly Vector2[] texCoords = new Vector2[MaxSprites * 6];
+
         private int cacheSize;
 
         public IDisposable Use { get; private set; }
 
+        private Bitmap bitmap = new Bitmap("wut.png");
+        private int texture;
+
         static SpriteBatch() {
-            ShaderProgram = new ShaderProgram();
-
-            VertexShader = new Shader(ShaderType.VertexShader, @"
-                #version 130
-
-                in vec3 vertex_pos;
-                in vec4 vertex_color;
-
-                out vec4 frag_color;
-
-                void main () {
-                    gl_Position = vec4(vertex_pos, 1.0);
-                    frag_color = vertex_color;
-                }
-            ");
-            VertexShader.Attach(ShaderProgram);
-
-            FragShader = new Shader(ShaderType.FragmentShader, @"
-                #version 130
-
-                in vec4 frag_color;
-                out vec4 color_out;
-
-                void main () {
-                    color_out = frag_color;
-                }
-            ");
-            FragShader.Attach(ShaderProgram);
-
-            GL.BindAttribLocation(ShaderProgram.ID, 0, "vertex_pos");
-            GL.BindAttribLocation(ShaderProgram.ID, 1, "vertex_color");
-
-            ShaderProgram.Link();
+            shaderCollection = new ShaderCollection();
+            shaderCollection.Load("resources/shaders/sprite");
         }
 
         public SpriteBatch() {
-            ShaderReferences++;
+            shaderReferences++;
 
             Use = new SpriteBatchUse(this);
 
-            vertexBuffer = new GraphicsBuffer(BufferTarget.ArrayBuffer);
+            vertexBuffer = new GraphicsBuffer(BufferTarget.ArrayBuffer, BufferUsageHint.StreamDraw);
             vertexBuffer.SetData(vertices);
-            colorBuffer = new GraphicsBuffer(BufferTarget.ArrayBuffer);
+            indexBuffer = new GraphicsBuffer(BufferTarget.ElementArrayBuffer, BufferUsageHint.StreamDraw);
+            indexBuffer.SetData(indices);
+
+            colorBuffer = new GraphicsBuffer(BufferTarget.ArrayBuffer, BufferUsageHint.StreamDraw);
             colorBuffer.SetData(colors);
-            //texBuffer = new GraphicsBuffer(BufferTarget.ArrayBuffer);
-            //texBuffer.SetData(texCoords);
+            texBuffer = new GraphicsBuffer(BufferTarget.ArrayBuffer, BufferUsageHint.StreamDraw);
+            texBuffer.SetData(texCoords);
 
             vertexArray = new VertexArray();
-            vertexArray.BindBuffer(vertexBuffer, 0);
-            vertexArray.BindBuffer(colorBuffer, 1);
-            //vertexArray.BindBuffer(texBuffer, 2);
+            vertexArray.BindBuffer(vertexBuffer, shaderCollection.Program, "in_pos");
+            vertexArray.BindBuffer(indexBuffer);
+            vertexArray.BindBuffer(colorBuffer, shaderCollection.Program, "in_color");
+            vertexArray.BindBuffer(texBuffer, shaderCollection.Program, "in_texcoord");
+
+            
+            GL.GenTextures(1, out texture);
+            GL.BindTexture(TextureTarget.Texture2D, texture);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+            BitmapData data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, data.Width, data.Height, 0, OpenTK.Graphics.OpenGL4.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
+            bitmap.UnlockBits(data);
+            
         }
 
         public void Dispose() {
             vertexBuffer.Dispose();
+            indexBuffer.Dispose();
             colorBuffer.Dispose();
-            //texBuffer.Dispose();
+            texBuffer.Dispose();
             vertexArray.Dispose();
 
-            ShaderReferences--;
-
-            if(ShaderReferences < 1) { // this is broken if you dispose all spritebatches and then make a new one
-                VertexShader.Dispose();
-                FragShader.Dispose();
-                ShaderProgram.Dispose();
+            shaderReferences--;
+            if(shaderReferences < 1) { // this is broken if you dispose all spritebatches and then make a new one
+                shaderCollection.Dispose();
             }
+
+            GL.DeleteTextures(1, ref texture);
         }
 
         public void Flush() {
             if(cacheSize == 0) return;
 
             vertexBuffer.SetData(vertices);
-            colorBuffer.SetData(colors);
-            //texBuffer.SetData(texCoords);
+            indexBuffer.SetData(indices);
+            vertexArray.BindBuffer(indexBuffer);
 
-            ShaderProgram.Use();
+            colorBuffer.SetData(colors);
+            texBuffer.SetData(texCoords);
+
+            shaderCollection.Use();
+
+            //GL.BindTexture(TextureTarget.Texture2D, texture);
+
+            /*
+            if(Texture.Current != null) {
+                GL.ActiveTexture(TextureUnit.Texture0);
+                shaderCollection.Program.SetUniform1("tex", Texture.Current.ID);
+            }
+            */
             vertexArray.Bind();
-            GL.DrawArrays(PrimitiveType.Triangles, 0, cacheSize * 6);
+            //GL.DrawArrays(PrimitiveType.Triangles, 0, cacheSize * 6);
+            GL.DrawElements(PrimitiveType.Triangles, cacheSize * 6, DrawElementsType.UnsignedInt, IntPtr.Zero);
+
+            Array.Clear(vertices, 0, vertices.Length);
+            Array.Clear(indices, 0, indices.Length);
+            Array.Clear(colors, 0, colors.Length);
 
             cacheSize = 0;
         }
 
         public void Draw(Texture2D texture, float x, float y, float width, float height, Color4 color, Vector2 origin, float rotation, SpriteEffects effects = SpriteEffects.None) {
             if(cacheSize + 1 > MaxSprites) {
-                Console.WriteLine("Spritebatch cache overflowed, forcing flush");
+                Log.Warn("Spritebatch cache overflowed, forcing flush");
                 Flush();
             }
 
             if(Texture.Current != texture) {
-                Console.WriteLine("Changing textures");
                 Flush();
                 texture.Bind();
             }
@@ -164,39 +172,35 @@ namespace KuubEngine.Graphics {
                 float newY = verts[i, 1];
                 verts[i, 0] = x + cos * newX - sin * newY;
                 verts[i, 1] = y + sin * newX + cos * newY;
-
-                //Console.WriteLine(verts[i, 0]);
-                //Console.WriteLine(verts[i, 1]);
-                //Console.WriteLine("=====");
             }
 
-            int vOffset = cacheSize * 6;
+            uint vOffset = (uint)(cacheSize * 4);
 
-            vertices[vOffset] = new Vector3(verts[0, 0], verts[0, 1], 0);
-            texCoords[vOffset] = new Vector2(xMin, yMin);
+            vertices[vOffset] = new Vector2(x, y);
+            vertices[vOffset + 1] = new Vector2(x + width, y);
+            vertices[vOffset + 2] = new Vector2(x, y + height);
+            vertices[vOffset + 3] = new Vector2(x + width, y + height);
 
-            vertices[vOffset + 1] = new Vector3(x + width, y + height, 0);
+            int iOffset = cacheSize * 6;
+            indices[iOffset] = vOffset;
+            indices[iOffset + 1] = vOffset + 2;
+            indices[iOffset + 2] = vOffset + 1;
+            indices[iOffset + 3] = vOffset + 1;
+            indices[iOffset + 4] = vOffset + 2;
+            indices[iOffset + 5] = vOffset + 3;
+
+            texCoords[vOffset] = new Vector2(xMin, yMax);
             texCoords[vOffset + 1] = new Vector2(xMax, yMax);
+            texCoords[vOffset + 2] = new Vector2(xMin, yMin);
+            texCoords[vOffset + 3] = new Vector2(xMax, yMin);
 
-            vertices[vOffset + 2] = new Vector3(x, y + height, 0);
-            texCoords[vOffset + 2] = new Vector2(xMin, yMax);
-
-            vertices[vOffset + 3] = new Vector3(verts[0, 0], verts[0, 1], 0);
-            texCoords[vOffset + 3] = new Vector2(xMin, yMin);
-
-            vertices[vOffset + 4] = new Vector3(x + width, y + height, 0);
-            texCoords[vOffset + 4] = new Vector2(xMax, yMax);
-
-            vertices[vOffset + 5] = new Vector3(x + width, y, 0);
-            texCoords[vOffset + 5] = new Vector2(xMax, yMin);
-
-            for(int i = 0; i < 6; i++) colors[vOffset + i] = color;
+            for(int i = 0; i < 4; i++) colors[vOffset + i] = color;
 
             cacheSize++;
         }
 
         public void Draw(Texture2D texture, float x, float y, float width, float height, Color4 color, SpriteEffects effects = SpriteEffects.None) {
-            Draw(texture, x, y, width, height, Color4.White, Vector2.Zero, 0, effects);
+            Draw(texture, x, y, width, height, color, Vector2.Zero, 0, effects);
         }
 
         public void Draw(Texture2D texture, float x, float y, float width, float height) {

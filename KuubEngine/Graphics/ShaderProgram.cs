@@ -4,6 +4,7 @@ using System.Diagnostics;
 using KuubEngine.Diagnostics;
 using KuubEngine.Utility;
 
+using OpenTK;
 using OpenTK.Graphics.OpenGL4;
 
 namespace KuubEngine.Graphics {
@@ -65,7 +66,13 @@ namespace KuubEngine.Graphics {
 
             int attributes;
             GL.GetProgram(ID, GetProgramParameterName.ActiveAttributes, out attributes);
-            Log.Debug("Program {0} linked with {1} attributes", ID, attributes);
+            Log.Debug("Program {0} linked with {1} attributes:", ID, attributes);
+            for(int i = 0; i < attributes; i++) {
+                int size;
+                ActiveAttribType type;
+                string attrib = GL.GetActiveAttrib(ID, i, out size, out type);
+                Log.Debug("\t{0}: {1} {2} {3}", i, size, type, attrib);
+            }
         }
 
         /// <summary>
@@ -76,6 +83,43 @@ namespace KuubEngine.Graphics {
 
             GL.UseProgram(ID);
             Current = this;
+        }
+
+        public int GetAttribLocation(string name) {
+            int index = GL.GetAttribLocation(ID, name);
+            if(index < 0) throw new ArgumentException("Couldn't find attrib location", "name");
+            return index;
+        }
+
+        public int GetUniformLocation(string name) {
+            int index = GL.GetUniformLocation(ID, name);
+            if(index < 0) throw new ArgumentException("Couldn't find uniform location", "name");
+            return index;
+        }
+
+        public void SetUniform1(string name, float value) {
+            Use();
+            GL.Uniform1(GetUniformLocation(name), value);
+        }
+
+        public void SetUniform1(string name, int value) {
+            Use();
+            GL.Uniform1(GetUniformLocation(name), value);  
+        }
+
+        public void SetUniform2(string name, Vector2 value) {
+            Use();
+            GL.Uniform2(GetUniformLocation(name), value);
+        }
+
+        public void SetUniform3(string name, Vector3 value) {
+            Use();
+            GL.Uniform3(GetUniformLocation(name), value);
+        }
+
+        public void SetUniform4(string name, Vector4 value) {
+            Use();
+            GL.Uniform4(GetUniformLocation(name), value);
         }
     }
 }

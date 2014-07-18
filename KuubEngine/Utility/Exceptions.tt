@@ -7,7 +7,7 @@ namespace KuubEngine.Utility {
 <#
 	//GenerateException("MissingComponent");
 	GenerateException("ContentLoad");
-	GenerateException("ShaderCompile");
+	//GenerateException("ShaderCompile");
 	GenerateException("ShaderLink");
 	GenerateException("ShaderValidate");
 #>

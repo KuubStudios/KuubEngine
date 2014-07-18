@@ -10,13 +10,6 @@ namespace KuubEngine.Utility {
 		protected ContentLoadException(SerializationInfo info, StreamingContext context) : base(info, context) {}
 	}
 	[Serializable]
-	public class ShaderCompileException : Exception {
-		public ShaderCompileException() {}
-		public ShaderCompileException(string message) : base(message) {}
-		public ShaderCompileException(string message, Exception inner) : base(message, inner) {}
-		protected ShaderCompileException(SerializationInfo info, StreamingContext context) : base(info, context) {}
-	}
-	[Serializable]
 	public class ShaderLinkException : Exception {
 		public ShaderLinkException() {}
 		public ShaderLinkException(string message) : base(message) {}

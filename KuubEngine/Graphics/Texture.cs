@@ -61,10 +61,10 @@ namespace KuubEngine.Graphics {
         protected abstract void Load();
 
         public void Bind() {
-            if(Current != this) {
-                GL.BindTexture(TextureTarget, ID);
-                Current = this;
-            }
+            if(Current == this) return;
+
+            GL.BindTexture(TextureTarget, ID);
+            Current = this;
 
             if(!Loaded) {
                 Load();

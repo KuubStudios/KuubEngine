@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Drawing.Imaging;
 
 using OpenTK;
 using OpenTK.Graphics.OpenGL4;
@@ -20,8 +21,8 @@ namespace KuubEngine.Graphics {
         }
 
         public Texture2D(Bitmap bitmap) : base(TextureTarget.Texture2D, bitmap.Width, bitmap.Height) {
-            MinFilter = TextureMinFilter.LinearMipmapNearest;
-            MagFilter = TextureMagFilter.Nearest;
+            MinFilter = TextureMinFilter.Linear;
+            MagFilter = TextureMagFilter.Linear;
 
             actualSize = MathHelper.NextPowerOfTwo(Math.Max(bitmap.Width, bitmap.Height));
             if(actualSize == bitmap.Width && actualSize == bitmap.Height) Bitmap = bitmap;
@@ -44,8 +45,8 @@ namespace KuubEngine.Graphics {
             GL.TexParameter(TextureTarget, TextureParameterName.TextureMinFilter, (int)MinFilter);
             GL.TexParameter(TextureTarget, TextureParameterName.TextureMagFilter, (int)MagFilter);
 
-            System.Drawing.Imaging.BitmapData data = Bitmap.LockBits(new Rectangle(0, 0, Bitmap.Width, Bitmap.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-            GL.TexImage2D(TextureTarget, 0, PixelInternalFormat.Rgba, Bitmap.Width, Bitmap.Height, 0, PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
+            BitmapData data = Bitmap.LockBits(new Rectangle(0, 0, Bitmap.Width, Bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, data.Width, data.Height, 0, OpenTK.Graphics.OpenGL4.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
             Bitmap.UnlockBits(data);
         }
 
