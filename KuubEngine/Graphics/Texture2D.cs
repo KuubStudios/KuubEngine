@@ -20,9 +20,9 @@ namespace KuubEngine.Graphics {
             Blank = new Texture2D(blank);
         }
 
-        public Texture2D(Bitmap bitmap) : base(TextureTarget.Texture2D, bitmap.Width, bitmap.Height) {
+        public Texture2D(Bitmap bitmap, TextureUnit unit = TextureUnit.Texture0) : base(TextureTarget.Texture2D, unit, bitmap.Width, bitmap.Height) {
             MinFilter = TextureMinFilter.Linear;
-            MagFilter = TextureMagFilter.Linear;
+            MagFilter = TextureMagFilter.Nearest;
 
             actualSize = MathHelper.NextPowerOfTwo(Math.Max(bitmap.Width, bitmap.Height));
             if(actualSize == bitmap.Width && actualSize == bitmap.Height) Bitmap = bitmap;

@@ -18,6 +18,7 @@ namespace KuubEngine.Graphics {
         public bool Loaded { get; private set; }
 
         public TextureTarget TextureTarget { get; private set; }
+        public TextureUnit TextureUnit { get; private set; }
 
         /// <summary>
         ///     Width of the texture in pixels
@@ -34,14 +35,17 @@ namespace KuubEngine.Graphics {
         /// </summary>
         public int Depth { get; private set; }
 
-        protected Texture(TextureTarget target, int width, int height, int depth = 1) {
+        protected Texture(TextureTarget target, TextureUnit unit, int width, int height, int depth = 1) {
             TextureTarget = target;
+            TextureUnit = unit;
             Width = width;
             Height = height;
             Depth = depth;
 
             Invalidate();
         }
+
+        protected Texture(TextureTarget target, int width, int height, int depth = 1) : this(target, TextureUnit.Texture0, width, height, depth) {}
 
 #if DEBUG
         ~Texture() {
@@ -63,6 +67,7 @@ namespace KuubEngine.Graphics {
         public void Bind() {
             if(Current == this) return;
 
+            GL.ActiveTexture(TextureUnit);
             GL.BindTexture(TextureTarget, ID);
             Current = this;
 
