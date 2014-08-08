@@ -70,11 +70,13 @@ namespace TestGame {
             */
 
             texture.Dispose();
-
         }
 
+        private float rot;
         protected override void Update(GameTime gameTime) {
             if(Keyboard.GetState()[Key.Escape]) Exit();
+
+            rot += 0.1f;
         }
 
         protected override void Draw(GameTime gameTime, float interpolation) {
@@ -84,7 +86,7 @@ namespace TestGame {
             //GL.DrawElements(PrimitiveType.Triangles, indexBuffer.Length, DrawElementsType.UnsignedInt, IntPtr.Zero);
 
             using(spriteBatch.Use) {
-                spriteBatch.Draw(texture, -0.5f, -0.5f, 1f, 1f, Color4.White);
+                spriteBatch.Draw(texture, -0.5f, -0.5f, 1f, 1f, Color4.White, rot);
                 //spriteBatch.Draw(texture, 0, 0, 1, 1, Color4.Green);
             }
         }

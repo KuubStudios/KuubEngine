@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Drawing;
-using System.Drawing.Imaging;
 
 using KuubEngine.Content.Assets;
 using KuubEngine.Diagnostics;
@@ -20,6 +18,7 @@ namespace KuubEngine.Graphics {
 
     public class SpriteBatch : IDisposable {
         private const int MaxSprites = 8192;
+        private readonly Vector2 centerOrigin = new Vector2(0.5f, 0.5f);
 
         private struct SpriteBatchUse : IDisposable {
             private readonly SpriteBatch spriteBatch;
@@ -42,6 +41,8 @@ namespace KuubEngine.Graphics {
         private readonly uint[] indices = new uint[MaxSprites * 6];
         private readonly Color4[] colors = new Color4[MaxSprites * 4];
         private readonly Vector2[] texCoords = new Vector2[MaxSprites * 6];
+
+        private readonly uint[] iValues = { 0, 2, 1, 1, 2, 3 };
 
         private int cacheSize;
 
@@ -137,7 +138,8 @@ namespace KuubEngine.Graphics {
             float xMax = flipH ? tMin.X : tMax.X;
             float yMax = flipV ? tMin.Y : tMax.Y;
 
-            float cos = (float)Math.Cos(rotation);
+            /*
+                         float cos = (float)Math.Cos(rotation);
             float sin = (float)Math.Sin(rotation);
 
             float originW = width * origin.X;
@@ -156,21 +158,45 @@ namespace KuubEngine.Graphics {
                 verts[i, 0] = x + cos * newX - sin * newY;
                 verts[i, 1] = y + sin * newX + cos * newY;
             }
+             */
+
+            float cos = (float)Math.Cos(rotation);
+            float sin = (float)Math.Sin(rotation);
+
+            float originX = x + width * origin.X;
+            float originY = y + height * origin.Y;
+
+            float[,] verts = {
+                { x, y },
+                { x + width, y },
+                { x, y + height },
+                { x + width, y + height }
+            };
+
+            for(int i = 0; i < 4; ++i) {
+                float oldX = verts[i, 0];
+                float oldY = verts[i, 1];
+                verts[i, 0] = originX + (cos * (oldX - originX) + sin * (oldY - originY));
+                verts[i, 1] = originY + (-sin * (oldX - originX) + cos * (oldY - originY));
+            }
+            
 
             uint vOffset = (uint)(cacheSize * 4);
 
+            /*
             vertices[vOffset] = new Vector2(x, y);
             vertices[vOffset + 1] = new Vector2(x + width, y);
             vertices[vOffset + 2] = new Vector2(x, y + height);
             vertices[vOffset + 3] = new Vector2(x + width, y + height);
+            */
+
+            vertices[vOffset] = new Vector2(verts[0, 0], verts[0, 1]);
+            vertices[vOffset + 1] = new Vector2(verts[1, 0], verts[1, 1]);
+            vertices[vOffset + 2] = new Vector2(verts[2, 0], verts[2, 1]);
+            vertices[vOffset + 3] = new Vector2(verts[3, 0], verts[3, 1]);
 
             int iOffset = cacheSize * 6;
-            indices[iOffset] = vOffset;
-            indices[iOffset + 1] = vOffset + 2;
-            indices[iOffset + 2] = vOffset + 1;
-            indices[iOffset + 3] = vOffset + 1;
-            indices[iOffset + 4] = vOffset + 2;
-            indices[iOffset + 5] = vOffset + 3;
+            for(int i = 0; i < 6; i++) indices[iOffset + i] = vOffset + iValues[i];
 
             texCoords[vOffset] = new Vector2(xMin, yMax);
             texCoords[vOffset + 1] = new Vector2(xMax, yMax);
@@ -181,6 +207,10 @@ namespace KuubEngine.Graphics {
 
             cacheSize++;
         }
+
+        public void Draw(Texture2D texture, float x, float y, float width, float height, Color4 color, float rotation, SpriteEffects effects = SpriteEffects.None) {
+            Draw(texture, x, y, width, height, color, centerOrigin, rotation, effects);
+        } 
 
         public void Draw(Texture2D texture, float x, float y, float width, float height, Color4 color, SpriteEffects effects = SpriteEffects.None) {
             Draw(texture, x, y, width, height, color, Vector2.Zero, 0, effects);
