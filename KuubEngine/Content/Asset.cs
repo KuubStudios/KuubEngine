@@ -2,8 +2,6 @@
 using System.Diagnostics;
 using System.IO;
 
-using Microsoft.SqlServer.Server;
-
 namespace KuubEngine.Content {
     public abstract class Asset : IDisposable {
         public bool Loaded { get; protected set; }

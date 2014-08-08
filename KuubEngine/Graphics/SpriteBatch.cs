@@ -34,6 +34,7 @@ namespace KuubEngine.Graphics {
 
         private static readonly ShaderCollection shaderCollection;
         private static int shaderReferences;
+        private static Matrix4 mvp;
 
         private readonly GraphicsBuffer vertexBuffer, indexBuffer, colorBuffer, texBuffer;
         private readonly VertexArray vertexArray;
@@ -42,7 +43,7 @@ namespace KuubEngine.Graphics {
         private readonly Color4[] colors = new Color4[MaxSprites * 4];
         private readonly Vector2[] texCoords = new Vector2[MaxSprites * 6];
 
-        private readonly uint[] iValues = { 0, 2, 1, 1, 2, 3 };
+        private readonly uint[] iValues = { 0, 1, 2, 1, 3, 2 };
 
         private int cacheSize;
 
@@ -51,6 +52,11 @@ namespace KuubEngine.Graphics {
         static SpriteBatch() {
             shaderCollection = new ShaderCollection();
             shaderCollection.Load("resources/shaders/sprite");
+        }
+
+        public static void Resize(int width, int height) {
+            mvp = Matrix4.CreateOrthographicOffCenter(0, width, height, 0, -10, 10);
+            shaderCollection.Program.SetUniformMatrix4("mvp", mvp);            
         }
 
         public SpriteBatch() {
@@ -133,38 +139,16 @@ namespace KuubEngine.Graphics {
 
             bool flipH = (effects & SpriteEffects.FlipHorizontally) == SpriteEffects.FlipHorizontally;
             bool flipV = (effects & SpriteEffects.FlipVertically) == SpriteEffects.FlipVertically;
-            float xMin = flipH ? tMax.X : tMin.X;
-            float yMin = flipV ? tMax.Y : tMin.Y;
             float xMax = flipH ? tMin.X : tMax.X;
-            float yMax = flipV ? tMin.Y : tMax.Y;
-
-            /*
-                         float cos = (float)Math.Cos(rotation);
-            float sin = (float)Math.Sin(rotation);
-
-            float originW = width * origin.X;
-            float originH = height * origin.Y;
-
-            float[,] verts = {
-                { -originW, -originH },
-                { originW, -originH },
-                { originW, originH },
-                { -originW, originH }
-            };
-
-            for(int i = 0; i < 4; ++i) {
-                float newX = verts[i, 0];
-                float newY = verts[i, 1];
-                verts[i, 0] = x + cos * newX - sin * newY;
-                verts[i, 1] = y + sin * newX + cos * newY;
-            }
-             */
+            float xMin = flipH ? tMax.X : tMin.X;
+            float yMax = flipV ? tMax.Y : tMin.Y;
+            float yMin = flipV ? tMin.Y : tMax.Y;
 
             float cos = (float)Math.Cos(rotation);
             float sin = (float)Math.Sin(rotation);
 
-            float originX = x + width * origin.X;
-            float originY = y + height * origin.Y;
+            float originX = x + origin.X;
+            float originY = y + origin.Y;
 
             float[,] verts = {
                 { x, y },

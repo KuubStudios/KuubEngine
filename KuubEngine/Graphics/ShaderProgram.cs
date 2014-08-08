@@ -121,5 +121,10 @@ namespace KuubEngine.Graphics {
             Use();
             GL.Uniform4(GetUniformLocation(name), value);
         }
+
+        public void SetUniformMatrix4(string name, Matrix4 value) {
+            Use();
+            GL.UniformMatrix4(GetUniformLocation(name), false, ref value);
+        }
     }
 }

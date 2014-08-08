@@ -50,6 +50,11 @@ namespace KuubEngine.Core {
         public ContentManager Content { get; protected set; }
 
         /// <summary>
+        ///     SpriteBatch for drawing 2D quads efficiently
+        /// </summary>
+        public SpriteBatch SpriteBatch { get; protected set; }
+
+        /// <summary>
         ///     Create a game with the specified configuration
         /// </summary>
         /// <param name="config"></param>
@@ -100,6 +105,8 @@ namespace KuubEngine.Core {
 
             Content = new ContentManager("resources/");
 
+            SpriteBatch = new SpriteBatch();
+
             Log.Info("Loading content");
             LoadContent(Content);
         }
@@ -109,11 +116,14 @@ namespace KuubEngine.Core {
             UnloadContent();
 
             Content.Unload();
+            SpriteBatch.Dispose();
             Texture2D.Blank.Dispose();
         }
 
         private void Resize(object sender, EventArgs e) {
             GL.Viewport(0, 0, Window.Width, Window.Height);
+            SpriteBatch.Resize(Window.Width, Window.Height);
+
             Resized();
         }
 

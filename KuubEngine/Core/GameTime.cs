@@ -8,7 +8,7 @@ namespace KuubEngine.Core {
     ///     Used to keep track of time
     /// </summary>
     public class GameTime {
-        private static readonly Stopwatch Stopwatch;
+        private static readonly Stopwatch stopwatch;
 
         /// <summary>
         ///     Elapsed time since the last frame
@@ -19,11 +19,11 @@ namespace KuubEngine.Core {
         ///     Total time since game launch
         /// </summary>
         public static TimeSpan Total {
-            get { return Stopwatch.Elapsed; }
+            get { return stopwatch.Elapsed; }
         }
 
         static GameTime() {
-            Stopwatch = Stopwatch.StartNew();
+            stopwatch = Stopwatch.StartNew();
         }
 
         public GameTime() {

@@ -29,7 +29,7 @@ namespace KuubEngine.Scene {
 
     public sealed class GameObject : IEnumerable<Component> {
         private static int nextID;
-        private static readonly Dictionary<string, GameObjectBuilder> Builders = new Dictionary<string, GameObjectBuilder>();
+        private static readonly Dictionary<string, GameObjectBuilder> builders = new Dictionary<string, GameObjectBuilder>();
 
         private readonly Dictionary<Type, Component> componentsDictionary = new Dictionary<Type, Component>();
 
@@ -60,11 +60,11 @@ namespace KuubEngine.Scene {
         }
 
         public static void Register(string name, GameObjectBuilderDelegate builder) {
-            Builders[name] = new GameObjectBuilder(name, builder);
+            builders[name] = new GameObjectBuilder(name, builder);
         }
 
         public static void Register(string name, string baseName, GameObjectBuilderDelegate builder) {
-            Builders[name] = new GameObjectBuilder(name, baseName, builder);
+            builders[name] = new GameObjectBuilder(name, baseName, builder);
         }
 
         public static GameObject Create(GameScene scene) {
@@ -72,7 +72,7 @@ namespace KuubEngine.Scene {
         }
 
         public static GameObject Create(GameScene scene, string type) {
-            GameObjectBuilder builder = Builders[type];
+            GameObjectBuilder builder = builders[type];
             GameObject ent = builder.Base != null ? Create(scene, builder.Base) : Create(scene);
             builder.Builder(ent);
             return ent;
