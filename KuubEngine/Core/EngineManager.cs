@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 using KuubEngine.Diagnostics;
 
@@ -13,9 +14,15 @@ namespace KuubEngine.Core {
         /// <param name="args">Command line arguments</param>
         /// <param name="catchErrors">Catch unhandled exceptions and show the crashreporter</param>
         public static void Start<T>(string[] args, bool catchErrors = true) where T : Game, new() {
-            using(Toolkit.Init()) using(T game = new T()) game.Run(args);
+            if(catchErrors) {
+                AppDomain.CurrentDomain.UnhandledException += (sender, eventArgs) => {
+                    Log.Error("Unhandled exception: {0}", eventArgs.ExceptionObject);
+                    File.WriteAllText("crash.txt", eventArgs.ExceptionObject.ToString());
+                    Environment.Exit(1);
+                };
+            }
 
-            if(catchErrors) AppDomain.CurrentDomain.UnhandledException += (sender, eventArgs) => Log.Error("Unhandled exception: {0}", eventArgs.ExceptionObject);
+            using(Toolkit.Init()) using(T game = new T()) game.Run(args);
         }
     }
 }
