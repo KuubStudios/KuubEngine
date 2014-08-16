@@ -61,6 +61,8 @@ namespace KuubEngine.Core {
         protected Game(GameConfiguration config) {
             if(config == null) throw new ArgumentNullException("config");
 
+            config.SaveFile("settings");
+
             lastGameTime = new GameTime();
 
 #if DEBUG

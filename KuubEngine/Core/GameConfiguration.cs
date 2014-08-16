@@ -97,8 +97,8 @@ namespace KuubEngine.Core {
                 return Default;
             }
 
-            GameConfiguration config = JsonConvert.DeserializeObject<GameConfiguration>(File.ReadAllText(file));
-            return config;
+            JsonConvert.PopulateObject(File.ReadAllText(file), this);
+            return this;
         }
 
         public void SaveFile(string file) { // TODO: handle file saving exceptions
