@@ -50,7 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Content\Asset.cs" />
-    <Compile Include="Content\Assets\ShaderCollection.cs" />
+    <Compile Include="Content\Assets\Effect.cs" />
     <Compile Include="Content\ContentManager.cs" />
     <Compile Include="Core\EngineManager.cs" />
     <Compile Include="Core\Game.cs" />
@@ -59,6 +59,7 @@
     <Compile Include="Diagnostics\Log.cs" />
     <Compile Include="Graphics\GraphicsBuffer.cs" />
     <Compile Include="Graphics\GraphicsDevice.cs" />
+    <Compile Include="Graphics\IBindable.cs" />
     <Compile Include="Graphics\Shader.cs" />
     <Compile Include="Graphics\ShaderProgram.cs" />
     <Compile Include="Graphics\SpriteBatch.cs" />

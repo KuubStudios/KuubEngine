@@ -8,7 +8,7 @@ using OpenTK;
 using OpenTK.Graphics.OpenGL4;
 
 namespace KuubEngine.Graphics {
-    public class ShaderProgram : IDisposable {
+    public class ShaderProgram : IDisposable, IBindable {
         /// <summary>
         ///     The ShaderProgram that is currently in use
         /// </summary>
@@ -75,14 +75,16 @@ namespace KuubEngine.Graphics {
             }
         }
 
-        /// <summary>
-        ///     Start using this ShaderProgram for drawing
-        /// </summary>
-        public void Use() {
-            if(Current == this) return;
+        public void Bind() {
+            if (Current == this) return;
 
             GL.UseProgram(ID);
             Current = this;
+        }
+
+        public void Unbind() {
+            GL.UseProgram(0);
+            Current = null;
         }
 
         public int GetAttribLocation(string name) {
@@ -98,32 +100,32 @@ namespace KuubEngine.Graphics {
         }
 
         public void SetUniform1(string name, float value) {
-            Use();
+            Bind();
             GL.Uniform1(GetUniformLocation(name), value);
         }
 
         public void SetUniform1(string name, int value) {
-            Use();
+            Bind();
             GL.Uniform1(GetUniformLocation(name), value);  
         }
 
         public void SetUniform2(string name, Vector2 value) {
-            Use();
+            Bind();
             GL.Uniform2(GetUniformLocation(name), value);
         }
 
         public void SetUniform3(string name, Vector3 value) {
-            Use();
+            Bind();
             GL.Uniform3(GetUniformLocation(name), value);
         }
 
         public void SetUniform4(string name, Vector4 value) {
-            Use();
+            Bind();
             GL.Uniform4(GetUniformLocation(name), value);
         }
 
         public void SetUniformMatrix4(string name, Matrix4 value) {
-            Use();
+            Bind();
             GL.UniformMatrix4(GetUniformLocation(name), false, ref value);
         }
     }

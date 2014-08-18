@@ -4,7 +4,7 @@ using System.Diagnostics;
 using OpenTK.Graphics.OpenGL4;
 
 namespace KuubEngine.Graphics {
-    public class VertexArray : IDisposable {
+    public class VertexArray : IDisposable, IBindable {
         private int id;
         public int ID {
             get {
@@ -46,7 +46,7 @@ namespace KuubEngine.Graphics {
             GL.BindVertexArray(ID);
         }
 
-        public static void Unbind() {
+        public void Unbind() {
             GL.BindVertexArray(0);
         }
     }

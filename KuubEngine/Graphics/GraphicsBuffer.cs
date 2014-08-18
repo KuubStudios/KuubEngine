@@ -7,7 +7,7 @@ using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
 
 namespace KuubEngine.Graphics {
-    public class GraphicsBuffer : IDisposable {
+    public class GraphicsBuffer : IDisposable, IBindable {
         private int id;
         public int ID {
             get {

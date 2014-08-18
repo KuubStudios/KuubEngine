@@ -32,7 +32,7 @@ namespace KuubEngine.Graphics {
             }
         }
 
-        private static readonly ShaderCollection shaderCollection;
+        private static readonly Effect shaderCollection;
         private static int shaderReferences;
         private static Matrix4 mvp;
 
@@ -42,7 +42,6 @@ namespace KuubEngine.Graphics {
         private readonly uint[] indices = new uint[MaxSprites * 6];
         private readonly Color4[] colors = new Color4[MaxSprites * 4];
         private readonly Vector2[] texCoords = new Vector2[MaxSprites * 6];
-
         private readonly uint[] iValues = { 0, 1, 2, 1, 3, 2 };
 
         private int cacheSize;
@@ -50,13 +49,13 @@ namespace KuubEngine.Graphics {
         public IDisposable Use { get; private set; }
 
         static SpriteBatch() {
-            shaderCollection = new ShaderCollection();
+            shaderCollection = new Effect();
             shaderCollection.Load("resources/shaders/sprite");
         }
 
         public static void Resize(int width, int height) {
             mvp = Matrix4.CreateOrthographicOffCenter(0, width, height, 0, -10, 10);
-            shaderCollection.Program.SetUniformMatrix4("mvp", mvp);            
+            shaderCollection.Program.SetUniformMatrix4("mvp", mvp);
         }
 
         public SpriteBatch() {
@@ -78,7 +77,7 @@ namespace KuubEngine.Graphics {
             vertexArray.BindBuffer(vertexBuffer, shaderCollection.Program, "in_pos");
             vertexArray.BindBuffer(indexBuffer);
             vertexArray.BindBuffer(colorBuffer, shaderCollection.Program, "in_color");
-            vertexArray.BindBuffer(texBuffer, shaderCollection.Program, "in_texcoord");          
+            vertexArray.BindBuffer(texBuffer, shaderCollection.Program, "in_texcoord");
         }
 
         public void Dispose() {
@@ -163,7 +162,6 @@ namespace KuubEngine.Graphics {
                 verts[i, 0] = originX + (cos * (oldX - originX) + sin * (oldY - originY));
                 verts[i, 1] = originY + (-sin * (oldX - originX) + cos * (oldY - originY));
             }
-            
 
             uint vOffset = (uint)(cacheSize * 4);
 
@@ -194,7 +192,7 @@ namespace KuubEngine.Graphics {
 
         public void Draw(Texture2D texture, float x, float y, float width, float height, Color4 color, float rotation, SpriteEffects effects = SpriteEffects.None) {
             Draw(texture, x, y, width, height, color, centerOrigin, rotation, effects);
-        } 
+        }
 
         public void Draw(Texture2D texture, float x, float y, float width, float height, Color4 color, SpriteEffects effects = SpriteEffects.None) {
             Draw(texture, x, y, width, height, color, Vector2.Zero, 0, effects);

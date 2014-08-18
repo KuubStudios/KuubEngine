@@ -11,43 +11,41 @@ using Newtonsoft.Json;
 using OpenTK.Graphics.OpenGL4;
 
 namespace KuubEngine.Content.Assets {
-    public class ShaderCollection : Asset {
+    public class Effect : Asset {
+        #region Serialization
         private class ShaderTypeEnumConverter : JsonConverter {
-            public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) {
-                ShaderType type = (ShaderType)value;
+            private string GetTypeString(ShaderType type) {
                 switch(type) {
                     case ShaderType.FragmentShader:
-                        writer.WriteValue("fragment");
-                        break;
+                        return "fragment";
                     case ShaderType.VertexShader:
-                        writer.WriteValue("vertex");
-                        break;
+                        return "vertex";
                     case ShaderType.GeometryShader:
-                        writer.WriteValue("geometry");
-                        break;
+                        return "geometry";
                     case ShaderType.TessEvaluationShader:
-                        writer.WriteValue("tesseval");
-                        break;
+                        return "tesseval";
                     case ShaderType.TessControlShader:
-                        writer.WriteValue("tesscontrol");
-                        break;
+                        return "tesscontrol";
                     case ShaderType.ComputeShader:
-                        writer.WriteValue("compute");
-                        break;
+                        return "compute";
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
             }
 
-            public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer) {
-                string value = (string)reader.Value;
+            public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) {
+                writer.WriteValue(GetTypeString((ShaderType)value));
+            }
 
-                if(value.ToLower() == "fragment") return ShaderType.FragmentShader;
-                if(value.ToLower() == "vertex") return ShaderType.VertexShader;
-                if(value.ToLower() == "geometry") return ShaderType.GeometryShader;
-                if(value.ToLower() == "tesseval") return ShaderType.TessEvaluationShader;
-                if(value.ToLower() == "tesscontrol") return ShaderType.TessControlShader;
-                if(value.ToLower() == "compute") return ShaderType.ComputeShader;
+            public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer) {
+                string value = ((string)reader.Value).ToLower();
+
+                if(value == "fragment") return ShaderType.FragmentShader;
+                if(value == "vertex") return ShaderType.VertexShader;
+                if(value == "geometry") return ShaderType.GeometryShader;
+                if(value == "tesseval") return ShaderType.TessEvaluationShader;
+                if(value == "tesscontrol") return ShaderType.TessControlShader;
+                if(value == "compute") return ShaderType.ComputeShader;
 
                 return null;
             }
@@ -80,11 +78,16 @@ namespace KuubEngine.Content.Assets {
             [JsonProperty("attributes", Required = Required.Default)]
             public Dictionary<string, int> Attributes { get; set; }
         }
+        #endregion
 
         public ShaderProgram Program { get; protected set; }
         private readonly List<Shader> shaders = new List<Shader>();
 
-        public override void Load(string path) {
+        public Effect() {
+            Program = new ShaderProgram();
+        }
+
+        public override void Load(string path) { 
             base.Load(path + ".json");
         }
 
@@ -94,21 +97,18 @@ namespace KuubEngine.Content.Assets {
 
             Log.Debug("Loading shader {0}", json.Name);
 
-            Program = new ShaderProgram();
-
-            for (int i = 0; i < json.Shaders.Length; i++) {
+            for(int i = 0; i < json.Shaders.Length; i++) {
                 Log.Debug("\tFound {0} {1}", json.Shaders[i].Type, json.Shaders[i].File);
-                
 
                 Shader shader = new Shader(json.Shaders[i].Type, File.ReadAllText(Path.Combine(root, json.Shaders[i].File)));
 
                 shader.Attach(Program);
                 shaders.Add(shader);
 
-                if (json.Shaders[i].Type == ShaderType.FragmentShader && json.Shaders[i].FragData != null) foreach (var fragdata in json.Shaders[i].FragData) GL.BindFragDataLocation(Program.ID, fragdata.Value, fragdata.Key);
+                if(json.Shaders[i].Type == ShaderType.FragmentShader && json.Shaders[i].FragData != null) foreach(var fragdata in json.Shaders[i].FragData) GL.BindFragDataLocation(Program.ID, fragdata.Value, fragdata.Key);
             }
 
-            if (json.Attributes != null && json.Attributes.Count > 0) foreach (var attrib in json.Attributes) GL.BindAttribLocation(Program.ID, attrib.Value, attrib.Key);
+            if(json.Attributes != null && json.Attributes.Count > 0) foreach(var attrib in json.Attributes) GL.BindAttribLocation(Program.ID, attrib.Value, attrib.Key);
 
             Program.Link();
 
@@ -123,7 +123,7 @@ namespace KuubEngine.Content.Assets {
         }
 
         public void Use() {
-            Program.Use();
+            Program.Bind();
         }
     }
 }

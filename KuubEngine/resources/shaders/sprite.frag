@@ -8,5 +8,5 @@ in vec2 texcoord;
 out vec4 out_color;
 
 void main () {
-    out_color = texture(tex, texcoord) * vec4(color, 1.0);
+    out_color = texture2D(tex, texcoord) * vec4(color, 1.0);
 }

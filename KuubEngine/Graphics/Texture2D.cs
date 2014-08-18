@@ -8,7 +8,7 @@ using OpenTK.Graphics.OpenGL4;
 namespace KuubEngine.Graphics {
     public class Texture2D : Texture {
         public static readonly Texture2D Blank;
-        private readonly int actualSize;
+        private int actualSize;
 
         public Bitmap Bitmap { get; private set; }
         public TextureMinFilter MinFilter { get; set; }
@@ -24,13 +24,7 @@ namespace KuubEngine.Graphics {
             MinFilter = TextureMinFilter.Linear;
             MagFilter = TextureMagFilter.Nearest;
 
-            actualSize = MathHelper.NextPowerOfTwo(Math.Max(bitmap.Width, bitmap.Height));
-            if(actualSize == bitmap.Width && actualSize == bitmap.Height) Bitmap = bitmap;
-            else {
-                Bitmap = new Bitmap(actualSize, actualSize);
-
-                for(int x = 0; x < Width; ++x) for(int y = 0; y < Height; ++y) Bitmap.SetPixel(x, y, bitmap.GetPixel(x, y));
-            }
+            SetData(bitmap);
         }
 
         public Texture2D(string path) : this(new Bitmap(path)) {}
@@ -48,6 +42,16 @@ namespace KuubEngine.Graphics {
             BitmapData data = Bitmap.LockBits(new Rectangle(0, 0, Bitmap.Width, Bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, data.Width, data.Height, 0, OpenTK.Graphics.OpenGL4.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
             Bitmap.UnlockBits(data);
+        }
+
+        public void SetData(Bitmap bitmap) {
+            actualSize = MathHelper.NextPowerOfTwo(Math.Max(bitmap.Width, bitmap.Height));
+            if (actualSize == bitmap.Width && actualSize == bitmap.Height) Bitmap = bitmap;
+            else {
+                Bitmap = new Bitmap(actualSize, actualSize);
+
+                for (int x = 0; x < Width; ++x) for (int y = 0; y < Height; ++y) Bitmap.SetPixel(x, y, bitmap.GetPixel(x, y));
+            }  
         }
 
         public Vector2 GetCoords(float x, float y) {
