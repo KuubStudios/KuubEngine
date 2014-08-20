@@ -6,11 +6,11 @@ namespace KuubEngine.Scene {
     public abstract class GameScene {
         protected Game Game { get; set; }
 
-        public List<Entity> GameObjects { get; private set; }
+        public List<Entity> Entities { get; private set; }
 
         protected GameScene(Game game) {
             Game = game;
-            GameObjects = new List<Entity>();
+            Entities = new List<Entity>();
         }
 
         public virtual void Start() {}
@@ -21,12 +21,12 @@ namespace KuubEngine.Scene {
         public virtual void Update(GameTime gameTime) {}
         public virtual void Draw(GameTime gameTime, float interpolation) {}
 
-        public void AddGameObject(Entity gameObject) {
-            if(!GameObjects.Contains(gameObject)) GameObjects.Add(gameObject);
+        public void Add(Entity ent) {
+            if(!Entities.Contains(ent)) Entities.Add(ent);
         }
 
-        public void RemoveGameObject(Entity gameObject) {
-            if(GameObjects.Contains(gameObject)) GameObjects.Remove(gameObject);
+        public void Remove(Entity ent) {
+            if(Entities.Contains(ent)) Entities.Remove(ent);
         }
     }
 }
