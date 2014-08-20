@@ -7,7 +7,7 @@ using KuubEngine.Core;
 using OpenTK;
 
 namespace KuubEngine.Scene {
-    public delegate void GameObjectBuilderDelegate(GameObject ent);
+    public delegate void GameObjectBuilderDelegate(Entity ent);
 
     public struct GameObjectBuilder {
         public readonly string Name;
@@ -27,7 +27,7 @@ namespace KuubEngine.Scene {
         }
     }
 
-    public sealed class GameObject : IEnumerable<Component> {
+    public sealed class Entity : IEnumerable<Component> {
         private static int nextID;
         private static readonly Dictionary<string, GameObjectBuilder> builders = new Dictionary<string, GameObjectBuilder>();
 
@@ -52,7 +52,7 @@ namespace KuubEngine.Scene {
 
         public bool Spawned { get; private set; }
 
-        private GameObject(GameScene scene) {
+        private Entity(GameScene scene) {
             ID = nextID++;
             Scene = scene;
             Scene.AddGameObject(this);
@@ -67,13 +67,13 @@ namespace KuubEngine.Scene {
             builders[name] = new GameObjectBuilder(name, baseName, builder);
         }
 
-        public static GameObject Create(GameScene scene) {
-            return new GameObject(scene);
+        public static Entity Create(GameScene scene) {
+            return new Entity(scene);
         }
 
-        public static GameObject Create(GameScene scene, string type) {
+        public static Entity Create(GameScene scene, string type) {
             GameObjectBuilder builder = builders[type];
-            GameObject ent = builder.Base != null ? Create(scene, builder.Base) : Create(scene);
+            Entity ent = builder.Base != null ? Create(scene, builder.Base) : Create(scene);
             builder.Builder(ent);
             return ent;
         }

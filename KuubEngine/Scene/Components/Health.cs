@@ -3,26 +3,26 @@
 namespace KuubEngine.Scene.Components {
     public class HealthChangedEventArgs : EventArgs {
         public readonly int Changed;
-        public readonly GameObject Entity;
+        public readonly Entity Entity;
 
         public bool HasEntity {
             get { return Entity != null; }
         }
 
-        public HealthChangedEventArgs(int changed, GameObject entity) {
+        public HealthChangedEventArgs(int changed, Entity entity) {
             Changed = changed;
             Entity = entity;
         }
     }
 
     public class KilledEventArgs : EventArgs {
-        public readonly GameObject Attacker;
+        public readonly Entity Attacker;
 
         public bool HasAttacker {
             get { return Attacker != null; }
         }
 
-        public KilledEventArgs(GameObject attacker = null) {
+        public KilledEventArgs(Entity attacker = null) {
             Attacker = attacker;
         }
     }
@@ -49,7 +49,7 @@ namespace KuubEngine.Scene.Components {
 
         public bool IsAlive { get; private set; }
 
-        public Health(GameObject ent) : base(ent) {
+        public Health(Entity ent) : base(ent) {
             MaxHealth = 1;
             Value = MaxHealth;
 
@@ -60,7 +60,7 @@ namespace KuubEngine.Scene.Components {
         public event EventHandler<HealthChangedEventArgs> Damaged;
         public event EventHandler<KilledEventArgs> Killed;
 
-        public void Revive(GameObject healer = null) {
+        public void Revive(Entity healer = null) {
             if(IsAlive) return;
 
             Value = MaxHealth;
@@ -69,14 +69,14 @@ namespace KuubEngine.Scene.Components {
             if(Healed != null) Healed(this, new HealthChangedEventArgs(MaxHealth, healer));
         }
 
-        public void Set(int amount, GameObject entity = null) {
+        public void Set(int amount, Entity entity = null) {
             int diff = amount - Value;
 
             if(diff > 0) Heal(diff, entity);
             else Damage(-diff, entity);
         }
 
-        public void Heal(int amount, GameObject healer = null) {
+        public void Heal(int amount, Entity healer = null) {
             if(amount == 0) return;
 
             if(amount < 0) {
@@ -88,7 +88,7 @@ namespace KuubEngine.Scene.Components {
             if(Healed != null) Healed(this, new HealthChangedEventArgs(amount, healer));
         }
 
-        public void Damage(int amount, GameObject attacker = null) {
+        public void Damage(int amount, Entity attacker = null) {
             if(amount == 0) return;
 
             if(amount < 0) {

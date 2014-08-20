@@ -7,7 +7,7 @@ using OpenTK;
 
 namespace KuubEngine.Scene {
     public abstract class Component {
-        public readonly GameObject Entity;
+        public readonly Entity Entity;
 
         protected int ID {
             get { return Entity.ID; }
@@ -22,12 +22,12 @@ namespace KuubEngine.Scene {
             get { return Entity.Position2D; }
         }
 
-        protected Component(GameObject ent) {
+        protected Component(Entity ent) {
             Entity = ent;
         }
 
-        public static T Create<T>(GameObject ent) where T : Component {
-            ConstructorInfo c = typeof(T).GetConstructor(new Type[] { typeof(GameObject) });
+        public static T Create<T>(Entity ent) where T : Component {
+            ConstructorInfo c = typeof(T).GetConstructor(new Type[] { typeof(Entity) });
             if(c == null) throw new MissingMethodException(typeof(T).FullName + " has no valid constructor.");
             return (T)c.Invoke(new object[] { ent });
         }
