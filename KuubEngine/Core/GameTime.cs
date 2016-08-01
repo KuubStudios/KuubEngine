@@ -1,41 +1,40 @@
-﻿using System;
-using System.Diagnostics;
+﻿// <copyright file="GameTime.cs" company="Kuub Studios">
+// Copyright (c) Kuub Studios. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+// </copyright>
 
-using KuubEngine.Utility;
+using System;
 
-namespace KuubEngine.Core {
+namespace KuubEngine.Core
+{
     /// <summary>
-    ///     Used to keep track of time
+    /// Used to keep track of changes in time between updates
     /// </summary>
-    public class GameTime {
-        private static readonly Stopwatch stopwatch;
+    public class GameTime
+    {
+        /// <summary>
+        /// Gets or sets the total time since game launched
+        /// </summary>
+        public TimeSpan Total { get; set; }
 
         /// <summary>
-        ///     Elapsed time since the last frame
+        /// Gets or sets the elapsed time since the last frame
         /// </summary>
         public TimeSpan Elapsed { get; set; }
 
         /// <summary>
-        ///     Total time since game launch
+        /// Initializes a new instance of the <see cref="GameTime"/> class.
         /// </summary>
-        public static TimeSpan Total {
-            get { return stopwatch.Elapsed; }
-        }
-
-        static GameTime() {
-            stopwatch = Stopwatch.StartNew();
-        }
-
-        public GameTime() {
+        public GameTime()
+        {
+            Total = TimeSpan.Zero;
             Elapsed = TimeSpan.Zero;
         }
 
-        internal void Update(double seconds) {
-            Elapsed = TimeSpan.FromTicks((long)(seconds * 10000000));
-        }
-
-        public override string ToString() {
-            return "{{ Total: {0}, Elapsed: {1} }}".Format(Total, Elapsed);
+        /// <inheritdoc/>
+        public override string ToString()
+        {
+            return string.Format("{{ Total: {0}, Elapsed: {1} }}", Total, Elapsed);
         }
     }
 }

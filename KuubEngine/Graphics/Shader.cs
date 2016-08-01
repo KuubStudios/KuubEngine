@@ -1,87 +1,108 @@
-﻿using System;
-using System.Diagnostics;
+﻿// <copyright file="Shader.cs" company="Kuub Studios">
+// Copyright (c) Kuub Studios. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+// </copyright>
 
-using KuubEngine.Diagnostics;
-using KuubEngine.Utility;
-
+using System;
+using KuubEngine.Graphics.Exceptions;
+using NLog;
 using OpenTK.Graphics.OpenGL4;
 
-namespace KuubEngine.Graphics {
-    public class ShaderCompileException : Exception {
-        public string SourceCode { get; set; }
+namespace KuubEngine.Graphics
+{
+    /// <summary>
+    /// Managed wrapper for OpenGL Shader objects
+    /// </summary>
+    public class Shader : IGLObject
+    {
+        private static Logger log = LogManager.GetCurrentClassLogger();
 
-        public ShaderCompileException(string message, string sourcecode) : base(message) {
-            SourceCode = sourcecode;
-        }
-    }
-
-    public class Shader : IDisposable {
         private int id;
-        public int ID {
-            get {
-                if(id == 0) id = GL.CreateShader(Type);
+
+        /// <inheritdoc/>
+        public int ID
+        {
+            get
+            {
+                if (id == 0)
+                {
+                    id = GL.CreateShader(Type);
+                }
+
                 return id;
             }
         }
 
+        /// <summary>
+        /// Gets or sets the <see cref="ShaderType"/> of this shader
+        /// </summary>
         public ShaderType Type { get; protected set; }
 
         /// <summary>
-        ///     Creates a new Shader of ShaderType type
+        /// Initializes a new instance of the <see cref="Shader"/> class.
         /// </summary>
-        /// <param name="type"></param>
-        public Shader(ShaderType type) {
+        /// <param name="type"><see cref="ShaderType"/></param>
+        public Shader(ShaderType type)
+        {
             Type = type;
         }
 
         /// <summary>
-        ///     Creates a new Shader of ShaderType type and compiles source
+        /// Initializes a new instance of the <see cref="Shader"/> class.
         /// </summary>
-        /// <param name="type"></param>
-        /// <param name="source"></param>
-        public Shader(ShaderType type, string source) : this(type) {
+        /// <param name="type"><see cref="ShaderType"/></param>
+        /// <param name="source">GLSL source to compile</param>
+        public Shader(ShaderType type, string source) : this(type)
+        {
             Load(source);
         }
 
-#if DEBUG
-        ~Shader() {
-            Debug.Assert(id == 0, this + " leaked!");
-        }
-#endif
-
-        public void Dispose() {
-            if(id != 0) {
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            if (id != 0)
+            {
                 GL.DeleteShader(id);
                 id = 0;
             }
         }
 
-        public override string ToString() {
-            return "{0} {1}".Format(Type, id);
+        /// <inheritdoc/>
+        public override string ToString()
+        {
+            return string.Format("{0} {1}", Type, id);
         }
 
         /// <summary>
         ///     Load and compile sourcecode
         /// </summary>
         /// <param name="source">GLSL sourcecode</param>
-        public void Load(string source) {
+        public void Load(string source)
+        {
             GL.ShaderSource(ID, source);
             GL.CompileShader(ID);
 
             int status;
             GL.GetShader(ID, ShaderParameter.CompileStatus, out status);
-            if(status != 1) throw new ShaderCompileException(GL.GetShaderInfoLog(ID), source);
+            if (status != 1)
+            {
+                throw new ShaderCompileException(GL.GetShaderInfoLog(ID), source);
+            }
 
             int length;
             GL.GetShader(ID, ShaderParameter.InfoLogLength, out length);
-            if(length > 1) Log.Warn("{0} info log not empty:\n\t{1}", this, GL.GetShaderInfoLog(ID).TrimEnd('\n').Replace("\n", "\n\t"));
+            if (length > 1)
+            {
+                log.Warn("{0} info log not empty:\n\t{1}", this, GL.GetShaderInfoLog(ID).TrimEnd('\n').Replace("\n", "\n\t"));
+            }
         }
 
         /// <summary>
         ///     Attaches this Shader to a ShaderProgram
         /// </summary>
-        /// <param name="program"></param>
-        public void Attach(ShaderProgram program) {
+        /// <param name="program"><see cref="ShaderProgram"/> to attach to</param>
+        public void Attach(ShaderProgram program)
+        {
             GL.AttachShader(program.ID, ID);
         }
     }

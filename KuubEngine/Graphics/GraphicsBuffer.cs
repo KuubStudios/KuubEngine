@@ -1,85 +1,103 @@
-﻿using System;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
+﻿// <copyright file="GraphicsBuffer.cs" company="Kuub Studios">
+// Copyright (c) Kuub Studios. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+// </copyright>
 
+using System;
+using System.Runtime.InteropServices;
+using KuubEngine.Graphics.Structures;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
 
-namespace KuubEngine.Graphics {
-    public class GraphicsBuffer : IDisposable, IBindable {
+namespace KuubEngine.Graphics
+{
+    /// <summary>
+    /// Managed wrapper for OpenGL Buffers
+    /// </summary>
+    public class GraphicsBuffer : IBindable
+    {
         private int id;
-        public int ID {
-            get {
-                if(id == 0) GL.GenBuffers(1, out id);
+
+        /// <inheritdoc/>
+        public int ID
+        {
+            get
+            {
+                if (id == 0)
+                {
+                    GL.GenBuffers(1, out id);
+                }
+
                 return id;
             }
         }
 
+        /// <summary>
+        /// Gets the length of the data
+        /// </summary>
         public int Length { get; private set; }
-        public int Stride { get; private set; }
-        public VertexAttribPointerType Type { get; private set; }
 
-        public BufferTarget Target { get; protected set; }
-        public BufferUsageHint Usage { get; protected set; }
+        /// <summary>
+        /// Gets the <see cref="BufferTarget"/>
+        /// </summary>
+        public BufferTarget Target { get; private set; }
 
-
-        public GraphicsBuffer(BufferTarget target, BufferUsageHint usage = BufferUsageHint.StaticDraw) {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GraphicsBuffer"/> class.
+        /// </summary>
+        /// <param name="target"><see cref="BufferTarget"/></param>
+        public GraphicsBuffer(BufferTarget target)
+        {
             Target = target;
-            Usage = usage;
         }
 
-#if DEBUG
-        ~GraphicsBuffer() {
-            Debug.Assert(id == 0, this + " leaked!");
+        /// <inheritdoc/>
+        public override string ToString()
+        {
+            return string.Format("GraphicsBuffer {0} {1}", Target, id);
         }
-#endif
 
-        public void Dispose() {
-            if(id != 0) {
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            if (id != 0)
+            {
                 GL.DeleteBuffer(id);
                 id = 0;
             }
         }
 
-        public void SetData<T>(T[] data, int stride, VertexAttribPointerType type) where T : struct {
-            if(data == null) throw new ArgumentNullException("data");
-
-            Length = data.Length;
-            Stride = stride;
-            Type = type;
-
-            Bind();
-            GL.BufferData(Target, new IntPtr(Length * Marshal.SizeOf(typeof(T))), data, Usage);
-            Unbind();
-        }
-
-        public void SetData(int[] data) {
-            SetData(data, 1, VertexAttribPointerType.Int);
-        }
-
-        public void SetData(uint[] data) {
-            SetData(data, 1, VertexAttribPointerType.UnsignedInt);
-        }
-
-        public void SetData(Vector3[] data) {
-            SetData(data, 3, VertexAttribPointerType.Float);
-        }
-
-        public void SetData(Vector2[] data) {
-            SetData(data, 2, VertexAttribPointerType.Float);
-        }
-
-        public void SetData(Color4[] data) {
-            SetData(data, 4, VertexAttribPointerType.Float);
-        }
-
-        public void Bind() {
+        /// <inheritdoc/>
+        public void Bind()
+        {
             GL.BindBuffer(Target, ID);
         }
 
-        public void Unbind() {
+        /// <inheritdoc/>
+        public void Unbind()
+        {
             GL.BindBuffer(Target, 0);
+        }
+
+        /// <summary>
+        /// Set buffer data
+        /// </summary>
+        /// <typeparam name="T">Type of element</typeparam>
+        /// <param name="data">Actual data to buffer</param>
+        /// <param name="usage"><see cref="BufferUsageHint"/></param>
+        public void SetData<T>(T[] data, BufferUsageHint usage = BufferUsageHint.StaticDraw) where T : struct
+        {
+            if (data == null)
+            {
+                throw new ArgumentNullException("data");
+            }
+
+            Length = data.Length;
+
+            Bind();
+            GL.BufferData(Target, new IntPtr(Length * Marshal.SizeOf(typeof(T))), data, usage);
+            Unbind();
         }
     }
 }

@@ -1,84 +1,100 @@
-﻿using System;
-using System.Diagnostics;
+﻿// <copyright file="Texture.cs" company="Kuub Studios">
+// Copyright (c) Kuub Studios. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+// </copyright>
 
 using OpenTK.Graphics.OpenGL4;
 
-namespace KuubEngine.Graphics {
-    public abstract class Texture : IDisposable {
-        public static Texture Current { get; private set; }
-
+namespace KuubEngine.Graphics
+{
+    /// <summary>
+    /// Managed wrapper for OpenGL Texture
+    /// </summary>
+    public abstract class Texture : IBindable
+    {
         private int id;
-        public int ID {
-            get {
-                if(id == 0) GL.GenTextures(1, out id);
+
+        /// <inheritdoc/>
+        public int ID
+        {
+            get
+            {
+                if (id == 0)
+                {
+                    GL.GenTextures(1, out id);
+                }
+
                 return id;
             }
         }
 
-        public bool Loaded { get; private set; }
-
-        public TextureTarget TextureTarget { get; private set; }
-        public TextureUnit TextureUnit { get; private set; }
+        /// <summary>
+        /// Gets the TextureTarget
+        /// </summary>
+        public TextureTarget TextureTarget { get; }
 
         /// <summary>
-        ///     Width of the texture in pixels
+        /// Gets the TextureUnit
         /// </summary>
-        public int Width { get; private set; }
+        public TextureUnit TextureUnit { get; }
 
         /// <summary>
-        ///     Height of the texture in pixels
+        /// Gets or sets the width of the texture in pixels
         /// </summary>
-        public int Height { get; private set; }
+        public int Width { get; protected set; }
 
         /// <summary>
-        ///     Depth of the texture in pixels
+        /// Gets or sets the height of the texture in pixels
         /// </summary>
-        public int Depth { get; private set; }
+        public int Height { get; protected set; }
 
-        protected Texture(TextureTarget target, TextureUnit unit, int width, int height, int depth = 1) {
+        /// <summary>
+        /// Gets or sets the depth of the texture
+        /// </summary>
+        public int Depth { get; protected set; }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Texture"/> class.
+        /// </summary>
+        /// <param name="target">TextureTarget</param>
+        /// <param name="unit">TextureUnit</param>
+        /// <param name="width">Width in pixels</param>
+        /// <param name="height">Height in pixels</param>
+        /// <param name="depth">Depth</param>
+        protected Texture(TextureTarget target, TextureUnit unit, int width, int height, int depth = 1)
+        {
             TextureTarget = target;
             TextureUnit = unit;
             Width = width;
             Height = height;
             Depth = depth;
-
-            Invalidate();
         }
 
-        protected Texture(TextureTarget target, int width, int height, int depth = 1) : this(target, TextureUnit.Texture0, width, height, depth) {}
-
-#if DEBUG
-        ~Texture() {
-            Debug.Assert(id == 0, this + " leaked!");
-        }
-#endif
-
-        public virtual void Dispose() {
-            if(id != 0) {
+        /// <inheritdoc/>
+        public virtual void Dispose()
+        {
+            if (id != 0)
+            {
                 GL.DeleteTexture(id);
                 id = 0;
             }
-
-            Loaded = false;
         }
 
-        protected abstract void Load();
-
-        public void Bind() {
-            if(Current == this) return;
-
-            GL.ActiveTexture(TextureUnit);
+        /// <inheritdoc/>
+        public void Bind()
+        {
             GL.BindTexture(TextureTarget, ID);
-            Current = this;
-
-            if(!Loaded) {
-                Load();
-                Loaded = true;
-            }
         }
 
-        public void Invalidate() {
-            Loaded = false;
+        /// <inheritdoc/>
+        public void Unbind()
+        {
+            GL.BindTexture(TextureTarget, 0);
         }
+
+        /// <summary>
+        /// Load actual image data into memory
+        /// </summary>
+        protected abstract void Load();
     }
 }
